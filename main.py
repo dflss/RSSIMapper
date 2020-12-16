@@ -68,7 +68,7 @@ def main():
     if program_data.input_csv:
         create_shapefile(program_data)
     read_shapefile(program_data)
-    # perform_measurements(program_data)
+    perform_measurements(program_data)
 
 
 if __name__ == '__main__':
