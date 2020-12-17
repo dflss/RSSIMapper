@@ -1,29 +1,19 @@
 import argparse
-from dataclasses import dataclass
 
 from measurements import Measurements
+from program_data import ProgramData
 from serial_connection import SerialConnection
-
-
-@dataclass
-class ProgramData:
-    input_file: str
-    output_file: str
-    map_output_file: str
-    port: str
-    baudrate: int
-    serial_timeout: int
-    measurement_timeout: int
-    n_points: int
+from shapefile_manager import ShapefileManager
 
 
 def parse_cmd_args():
     parser = argparse.ArgumentParser()
     optional = parser._action_groups.pop()
+    optional.add_argument("-ic", "--input_csv", help="input csv to create shapefile")
     required = parser.add_argument_group('required arguments')
-    required.add_argument("-i", "--input_file", help="input shapefile", required=True)
-    required.add_argument("-o", "--output_file", help="text file for saving results", required=True)
-    required.add_argument("-m", "--map_output_file", help="file for saving colored map", required=True)
+    required.add_argument("-is", "--input_shapefile", help="input shapefile", required=True)
+    required.add_argument("-or", "--output_results", help="text file for saving results", required=True)
+    required.add_argument("-os", "--output_shapefile", help="file for saving colored map", required=True)
     required.add_argument("-p", "--port", help="port where board is connected", required=True)
     required.add_argument("-b", "--baudrate", help="baudrate for serial connection", required=True)
     required.add_argument("-st", "--serial_timeout", help="timeout for serial connection", required=True)
@@ -33,9 +23,10 @@ def parse_cmd_args():
     args = parser.parse_args()
     return \
         ProgramData(
-            args.input_file,
-            args.output_file,
-            args.map_output_file,
+            args.input_csv,
+            args.input_shapefile,
+            args.output_results,
+            args.output_shapefile,
             args.port,
             int(args.baudrate),
             int(args.serial_timeout),
@@ -44,8 +35,7 @@ def parse_cmd_args():
         )
 
 
-def main():
-    program_data = parse_cmd_args()
+def perform_measurements(program_data):
     serial_conn = \
         SerialConnection(
             port=program_data.port,
@@ -62,6 +52,23 @@ def main():
         if input('Press enter to continue, q + enter to quit ') == 'q':
             exit(0)
         print(measurements.measure_point())
+
+
+def create_shapefile(program_data):
+    shapefile_man = ShapefileManager()
+    shapefile_man.write(program_data.input_csv, program_data.input_shapefile)
+
+def read_shapefile(program_data):
+    shapefile_man = ShapefileManager()
+    shapefile_man.read(program_data.input_shapefile)
+
+
+def main():
+    program_data = parse_cmd_args()
+    if program_data.input_csv:
+        create_shapefile(program_data)
+    read_shapefile(program_data)
+    perform_measurements(program_data)
 
 
 if __name__ == '__main__':
