@@ -49,9 +49,14 @@ def perform_measurements(program_data: ProgramData):
             timeout=program_data.measurement_timeout
         )
     while True:
-        if input('Press enter to continue, q + enter to quit ') == 'q':
+        user_input = input('Type measurement point id and click enter, q + enter to quit ')
+        if user_input == 'q':
             exit(0)
-        print(measurements.measure_point())
+        try:
+            mp_id = int(user_input)
+            print(measurements.measure_point(mp_id))
+        except ValueError:
+            print("Measurement point id must be an integer value.")
 
 
 def create_shapefile(program_data: ProgramData):
