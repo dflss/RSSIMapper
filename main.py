@@ -6,7 +6,7 @@ from serial_connection import SerialConnection
 from shapefile_manager import ShapefileManager
 
 
-def parse_cmd_args():
+def parse_cmd_args() -> ProgramData:
     parser = argparse.ArgumentParser()
     optional = parser._action_groups.pop()
     optional.add_argument("-ic", "--input_csv", help="input csv to create shapefile")
@@ -35,7 +35,7 @@ def parse_cmd_args():
         )
 
 
-def perform_measurements(program_data):
+def perform_measurements(program_data: ProgramData):
     serial_conn = \
         SerialConnection(
             port=program_data.port,
@@ -54,12 +54,12 @@ def perform_measurements(program_data):
         print(measurements.measure_point())
 
 
-def create_shapefile(program_data):
+def create_shapefile(program_data: ProgramData):
     shapefile_man = ShapefileManager()
     shapefile_man.write(program_data.input_csv, program_data.input_shapefile)
 
 
-def read_shapefile(program_data):
+def read_shapefile(program_data: ProgramData):
     shapefile_man = ShapefileManager()
     shapefile_man.read(program_data.input_shapefile)
 
