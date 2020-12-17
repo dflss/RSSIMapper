@@ -1,4 +1,5 @@
 import argparse
+from typing import List
 
 from measurements import Measurements
 from program_data import ProgramData
@@ -35,7 +36,7 @@ def parse_cmd_args() -> ProgramData:
         )
 
 
-def perform_measurements(program_data: ProgramData):
+def perform_measurements(program_data: ProgramData, ids: List[int]):
     serial_conn = \
         SerialConnection(
             port=program_data.port,
@@ -54,7 +55,10 @@ def perform_measurements(program_data: ProgramData):
             exit(0)
         try:
             mp_id = int(user_input)
-            print(measurements.measure_point(mp_id))
+            if mp_id in ids:
+                print(measurements.measure_point(mp_id))
+            else:
+                print("This id does not exist in the given shapefile.")
         except ValueError:
             print("Measurement point id must be an integer value.")
 
@@ -64,17 +68,17 @@ def create_shapefile(program_data: ProgramData):
     shapefile_man.write(program_data.input_csv, program_data.input_shapefile)
 
 
-def read_shapefile(program_data: ProgramData):
+def read_shapefile(program_data: ProgramData) -> List[int]:
     shapefile_man = ShapefileManager()
-    shapefile_man.read(program_data.input_shapefile)
+    return shapefile_man.read(program_data.input_shapefile)
 
 
 def main():
     program_data = parse_cmd_args()
     if program_data.input_csv:
         create_shapefile(program_data)
-    read_shapefile(program_data)
-    perform_measurements(program_data)
+    ids = read_shapefile(program_data)
+    perform_measurements(program_data, ids)
 
 
 if __name__ == '__main__':
