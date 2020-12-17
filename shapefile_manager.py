@@ -13,8 +13,8 @@ class ShapefileManager:
             w.field('Y', 'F', 10, 8)
             w.field('ID', 'N')
             for i, point in data.iterrows():
-                w.point(point.x, point.y)  # type: ignore
-                w.record(point.x, point.y, point.id)  # type: ignore
+                w.point(point['x'], point['y'])
+                w.record(point['x'], point['y'], point['id'])
 
     def read(self, filename: str):
         sf = shp.Reader(filename)
