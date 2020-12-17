@@ -9,7 +9,7 @@ from shapefile_manager import ShapefileManager
 def parse_cmd_args():
     parser = argparse.ArgumentParser()
     optional = parser._action_groups.pop()
-    optional.add_argument("-ic", "--input_csv", help="input csv to create shapefile", default=None)
+    optional.add_argument("-ic", "--input_csv", help="input csv to create shapefile")
     required = parser.add_argument_group('required arguments')
     required.add_argument("-is", "--input_shapefile", help="input shapefile", required=True)
     required.add_argument("-or", "--output_results", help="text file for saving results", required=True)

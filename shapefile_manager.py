@@ -21,10 +21,10 @@ class ShapefileManager:
         x_values = []
         y_values = []
         for shape in sf.shapeRecords():
-            x = [i[0] for i in shape.shape.points[:]]
-            y = [i[1] for i in shape.shape.points[:]]
-            x_values.append(x[0])
-            y_values.append(y[0])
+            x = shape.shape.points[0][0]
+            y = shape.shape.points[0][1]
+            x_values.append(x)
+            y_values.append(y)
         data = pd.DataFrame({'x': x_values, 'y': y_values})
         sns.scatterplot(x="x", y="y", data=data, palette="coolwarm")
         plt.show()
