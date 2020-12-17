@@ -58,6 +58,7 @@ def create_shapefile(program_data):
     shapefile_man = ShapefileManager()
     shapefile_man.write(program_data.input_csv, program_data.input_shapefile)
 
+
 def read_shapefile(program_data):
     shapefile_man = ShapefileManager()
     shapefile_man.read(program_data.input_shapefile)

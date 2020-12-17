@@ -19,7 +19,7 @@ class SerialConnection:
             self.ser.flushOutput()
             time.sleep(0.1)
         except Exception as e:
-            logging.error("Exception occurred", exc_info=True)
+            logging.error(f"Exception occurred: {e}", exc_info=True)
         logging.info(self.ser)
 
     def __del__(self):
