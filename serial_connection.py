@@ -2,7 +2,7 @@ import logging
 import time
 from typing import Optional
 
-import serial
+import serial  # type: ignore
 
 
 class SerialConnection:

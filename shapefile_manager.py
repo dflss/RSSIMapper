@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import shapefile as shp
-import seaborn as sns
+import shapefile as shp  # type: ignore
+import seaborn as sns  # type: ignore
 import pandas as pd
 
 
@@ -13,8 +13,8 @@ class ShapefileManager:
             w.field('Y', 'F', 10, 8)
             w.field('ID', 'N')
             for i, point in data.iterrows():
-                w.point(point.x, point.y)
-                w.record(point.x, point.y, point.id)
+                w.point(point.x, point.y)  # type: ignore
+                w.record(point.x, point.y, point.id)  # type: ignore
 
     def read(self, filename: str):
         sf = shp.Reader(filename)
