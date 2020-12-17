@@ -6,7 +6,7 @@ import pandas as pd
 
 class ShapefileManager:
 
-    def write(self, csv, shapefile):
+    def write(self, csv: str, shapefile: str):
         data = pd.read_csv(csv)
         with shp.Writer(shapefile) as w:
             w.field('X', 'F', 10, 8)
@@ -16,7 +16,7 @@ class ShapefileManager:
                 w.point(point.x, point.y)
                 w.record(point.x, point.y, point.id)
 
-    def read(self, filename):
+    def read(self, filename: str):
         sf = shp.Reader(filename)
         x_values = []
         y_values = []

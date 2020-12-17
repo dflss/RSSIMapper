@@ -1,15 +1,18 @@
 import statistics
 import time
+from typing import Optional, Tuple, List
+
+from serial_connection import SerialConnection
 
 
 class Measurements:
-    def __init__(self, serial_conn, points_number, timeout):
+    def __init__(self, serial_conn: SerialConnection, points_number: int, timeout: int):
         self.serial_conn = serial_conn
         self.points_number = points_number
         self.timeout = timeout
 
-    def measure_point(self):
-        rssi_values = []
+    def measure_point(self) -> Optional[Tuple[float, float]]:
+        rssi_values: List[int] = []
         start = time.time()
         while time.time() - start < self.timeout and len(rssi_values) < self.points_number:
             bytes_to_read = self.serial_conn.ser.inWaiting()
