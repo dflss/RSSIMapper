@@ -40,7 +40,6 @@ jobs:
     - name: Cache pip
       uses: actions/cache@v2
       with:
-        path: code/backend/venv
         key: ${{ runner.os }}-python-venv-${{ hashFiles('requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-python-venv-
@@ -61,7 +60,6 @@ jobs:
     - name: Cache pip
       uses: actions/cache@v2
       with:
-        path: code/backend/venv
         key: ${{ runner.os }}-python-venv-${{ hashFiles('requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-python-venv-
