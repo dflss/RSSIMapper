@@ -1,4 +1,5 @@
 from typing import List
+from dbfpy3 import dbf # type: ignore
 
 import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
@@ -23,41 +24,51 @@ class ShapefileManager:
                 w.record(polygon['id'])
 
     def write_output_map(self, input_shapefile: str, output_shapefile: str):
-        r = shp.Reader(input_shapefile)
-        with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
-            w.field('ID', 'N')
-            w.field('RSSI', 'N')
-            w.field('PERC', 'N')
-            print(w.fields)
-            for shaperec in r.iterShapeRecords():
-                w.record(shaperec.record['ID'], 0, 0)
-                w.shape(shaperec.shape)
+        with shp.Reader(input_shapefile) as r:
+            with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
+                w.field('ID', 'N')
+                w.field('RSSI', 'N')
+                w.field('PERC', 'N')
+                for shaperec in r.iterShapeRecords():
+                    w.record(shaperec.record['ID'], 0, 0)
+                    w.shape(shaperec.shape)
 
     def read(self, filename: str) -> List[int]:
-        sf = shp.Reader(filename)
-        ids = []
-        plt.figure()
-        for shape in sf.shapeRecords():
-            x = [i[0] for i in shape.shape.points[:]]
-            y = [i[1] for i in shape.shape.points[:]]
-            plt.plot(x, y)
-        for rec in sf.records():
-            ids.append(rec['ID'])
-        plt.show()
-        return ids
+        with shp.Reader(filename) as sf:
+            ids = []
+            plt.figure()
+            for shape in sf.shapeRecords():
+                x = [i[0] for i in shape.shape.points[:]]
+                y = [i[1] for i in shape.shape.points[:]]
+                plt.plot(x, y)
+            for rec in sf.records():
+                ids.append(rec['ID'])
+            # plt.show()
+            return ids
 
     def read_output(self, filename: str):
-        sf = shp.Reader(filename)
-        plt.figure()
-        for shape in sf.shapeRecords():
-            x = [i[0] for i in shape.shape.points[:]]
-            y = [i[1] for i in shape.shape.points[:]]
-            plt.plot(x, y)
-        for rec in sf.records():
-            print(rec['ID'])
-            print(rec['RSSI'])
-            print(rec['PERC'])
-        plt.show()
+        with shp.Reader(filename) as sf:
+            plt.figure()
+            for shape in sf.shapeRecords():
+                x = [i[0] for i in shape.shape.points[:]]
+                y = [i[1] for i in shape.shape.points[:]]
+                plt.plot(x, y)
+            for rec in sf.records():
+                print(rec['ID'], rec['RSSI'], rec['PERC'])
+            plt.show()
 
     def update_map_with_rssi_data(self, shapefile: str, id: int, rssi: int, perc: int):
         print(f"Update id {id} with RSSI {rssi} and {perc}%")
+        with shp.Reader(shapefile) as r:
+            records = list(r.iterShapeRecords())
+        with shp.Writer(shapefile, shapeType=shp.POLYGON) as w:
+            w.field('ID', 'N')
+            w.field('RSSI', 'N')
+            w.field('PERC', 'N')
+            for shaperec in records:
+                if shaperec.record['ID'] == id:
+                    w.record(id, rssi, perc)
+                else:
+                    w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
+                w.shape(shaperec.shape)
+

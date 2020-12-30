@@ -85,6 +85,8 @@ def main():
     shapefile_man.write_output_map(program_data.input_shapefile, program_data.output_shapefile)
     # ids = read_input_shapefile(program_data, shapefile_man)
     read_output_shapefile(program_data, shapefile_man)
+    shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, 0, 10, 100)
+    read_output_shapefile(program_data, shapefile_man)
     # perform_measurements(program_data, ids)
 
 
