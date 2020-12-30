@@ -1,4 +1,4 @@
-from typing import List
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
@@ -32,20 +32,7 @@ class ShapefileManager:
                     w.record(shaperec.record['ID'], 0, 0)
                     w.shape(shaperec.shape)
 
-    def read_input(self, filename: str) -> List[int]:
-        with shp.Reader(filename) as sf:
-            ids = []
-            plt.figure()
-            for shape in sf.shapeRecords():
-                x = [i[0] for i in shape.shape.points[:]]
-                y = [i[1] for i in shape.shape.points[:]]
-                plt.plot(x, y)
-            for rec in sf.records():
-                ids.append(rec['ID'])
-            plt.show()
-            return ids
-
-    def read_output_rssi(self, filename: str):
+    def read_output_rssi(self, filename: str) -> Tuple[list, plt.Figure]:
         def get_color(rssi):
             if rssi == 0:
                 return 'grey'
@@ -60,13 +47,14 @@ class ShapefileManager:
 
         with shp.Reader(filename) as sf:
             fig = plt.figure()
+            ids = []
             for shaperec in sf.shapeRecords():
                 x = [i[0] for i in shaperec.shape.points[:]]
                 y = [i[1] for i in shaperec.shape.points[:]]
-                plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']))
+                plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']), lw=0.5, edgecolor='black')
+                ids.append(shaperec.record['ID'])
                 print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
-
-        return fig
+        return ids, fig
 
     def read_output_perc(self, filename: str):
         def get_color(perc):
