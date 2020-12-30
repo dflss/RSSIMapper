@@ -50,15 +50,16 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
             timeout=program_data.measurement_timeout
         )
     while True:
-        user_input = input('Type measurement point id and click enter, q + enter to quit ')
+        user_input = input('Type measurement point id and click enter, '
+                           'q + enter to quit measurements and show results ')
         if user_input == 'q':
-            exit(0)
+            return
         try:
             mp_id = int(user_input)
             if mp_id in ids:
                 rssi, perc = measurements.measure_point()
                 shapefile_man = ShapefileManager()
-                shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, mp_id, rssi, perc)
+                shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, mp_id, int(rssi), int(perc))
             else:
                 print("This id does not exist in the given shapefile.")
         except ValueError:
@@ -70,11 +71,11 @@ def create_shapefile(program_data: ProgramData, shapefile_man: ShapefileManager)
 
 
 def read_input_shapefile(program_data: ProgramData, shapefile_man: ShapefileManager) -> List[int]:
-    return shapefile_man.read(program_data.input_shapefile)
+    return shapefile_man.read_input(program_data.input_shapefile)
 
 
 def read_output_shapefile(program_data: ProgramData, shapefile_man: ShapefileManager) -> List[int]:
-    return shapefile_man.read_output(program_data.output_shapefile)
+    return shapefile_man.read_output_rssi(program_data.output_shapefile)
 
 
 def main():
@@ -83,11 +84,12 @@ def main():
     if program_data.input_csv:
         create_shapefile(program_data, shapefile_man)
     shapefile_man.write_output_map(program_data.input_shapefile, program_data.output_shapefile)
-    # ids = read_input_shapefile(program_data, shapefile_man)
+    ids = read_input_shapefile(program_data, shapefile_man)
     read_output_shapefile(program_data, shapefile_man)
-    shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, 0, 10, 100)
+    # shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, 0, -60, 100)
+    # read_output_shapefile(program_data, shapefile_man)
+    perform_measurements(program_data, ids)
     read_output_shapefile(program_data, shapefile_man)
-    # perform_measurements(program_data, ids)
 
 
 if __name__ == '__main__':

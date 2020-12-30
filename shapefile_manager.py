@@ -32,7 +32,7 @@ class ShapefileManager:
                     w.record(shaperec.record['ID'], 0, 0)
                     w.shape(shaperec.shape)
 
-    def read(self, filename: str) -> List[int]:
+    def read_input(self, filename: str) -> List[int]:
         with shp.Reader(filename) as sf:
             ids = []
             plt.figure()
@@ -42,18 +42,45 @@ class ShapefileManager:
                 plt.plot(x, y)
             for rec in sf.records():
                 ids.append(rec['ID'])
-            # plt.show()
+            plt.show()
             return ids
 
-    def read_output(self, filename: str):
+    def read_output_rssi(self, filename: str):
+        def get_color(rssi):
+            if rssi < -90:
+                return 'blue'
+            elif rssi < -70:
+                return 'green'
+            elif rssi < -50:
+                return 'yellow'
+            else:
+                return 'red'
         with shp.Reader(filename) as sf:
             plt.figure()
-            for shape in sf.shapeRecords():
-                x = [i[0] for i in shape.shape.points[:]]
-                y = [i[1] for i in shape.shape.points[:]]
-                plt.plot(x, y)
-            for rec in sf.records():
-                print(rec['ID'], rec['RSSI'], rec['PERC'])
+            for shaperec in sf.shapeRecords():
+                x = [i[0] for i in shaperec.shape.points[:]]
+                y = [i[1] for i in shaperec.shape.points[:]]
+                plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']))
+                print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
+            plt.show()
+
+    def read_output_perc(self, filename: str):
+        def get_color(perc):
+            if perc < 40:
+                return 'blue'
+            elif perc < 60:
+                return 'green'
+            elif perc < 80:
+                return 'yellow'
+            else:
+                return 'red'
+        with shp.Reader(filename) as sf:
+            plt.figure()
+            for shaperec in sf.shapeRecords():
+                x = [i[0] for i in shaperec.shape.points[:]]
+                y = [i[1] for i in shaperec.shape.points[:]]
+                plt.fill_between(x, y, color=get_color(shaperec.record['PERC']))
+                print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
             plt.show()
 
     def update_map_with_rssi_data(self, shapefile: str, id: int, rssi: int, perc: int):
@@ -70,4 +97,3 @@ class ShapefileManager:
                 else:
                     w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
                 w.shape(shaperec.shape)
-
