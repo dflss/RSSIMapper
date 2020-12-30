@@ -57,9 +57,11 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
         try:
             mp_id = int(user_input)
             if mp_id in ids:
-                rssi, perc = measurements.measure_point()
-                shapefile_man = ShapefileManager()
-                shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, mp_id, int(rssi), int(perc))
+                result = measurements.measure_point()
+                if result:
+                    rssi, perc = result
+                    shapefile_man = ShapefileManager()
+                    shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, mp_id, int(rssi), int(perc))
             else:
                 print("This id does not exist in the given shapefile.")
         except ValueError:
