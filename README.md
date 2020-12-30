@@ -56,7 +56,7 @@ optional arguments:
 Example usage:
 
 ```
-python main.py -ic example-data.csv -is input_map -or output -os map -p /dev/pts/1 -b 115200 -st 10 -mt 100 -n 100
+python main.py -ic example-data.csv -is input_map -or output -os map -p /dev/pts/2 -b 115200 -st 10 -mt 100 -n 100
 ```
 
 ## Testing
@@ -72,8 +72,8 @@ socat -d -d pty,raw,echo=0,b9600 pty,raw,echo=0,b9600
 The output should be similar to the following:
 
 ```
+2020/12/18 09:05:37 socat[347564] N PTY is /dev/pts/2
 2020/12/18 09:05:37 socat[347564] N PTY is /dev/pts/3
-2020/12/18 09:05:37 socat[347564] N PTY is /dev/pts/4
 2020/12/18 09:05:37 socat[347564] N starting data transfer loop with FDs [5,5] and [9,9]
 ```
 
