@@ -1,5 +1,4 @@
 from typing import List
-from dbfpy3 import dbf # type: ignore
 
 import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
