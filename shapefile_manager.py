@@ -47,6 +47,8 @@ class ShapefileManager:
 
     def read_output_rssi(self, filename: str):
         def get_color(rssi):
+            if rssi == 0:
+                return 'grey'
             if rssi < -90:
                 return 'blue'
             elif rssi < -70:
@@ -55,14 +57,16 @@ class ShapefileManager:
                 return 'yellow'
             else:
                 return 'red'
+
         with shp.Reader(filename) as sf:
-            plt.figure()
+            fig = plt.figure()
             for shaperec in sf.shapeRecords():
                 x = [i[0] for i in shaperec.shape.points[:]]
                 y = [i[1] for i in shaperec.shape.points[:]]
                 plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']))
                 print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
-            plt.show()
+
+        return fig
 
     def read_output_perc(self, filename: str):
         def get_color(perc):
