@@ -14,6 +14,8 @@ class Gui:
         self.shapefile_man = ShapefileManager()
         self.shapefile_man.write_output_map('input_map', 'map')
         tk.Button(self.root, text="Quit", command=self.root.quit).pack()
+        tk.Button(self.root, text="Upload csv", command=self.upload_csv).pack()
+        tk.Button(self.root, text="Upload shapefile", command=self.upload_shapefile).pack()
         self.refresh_plot()
         self.root.mainloop()
 
@@ -40,11 +42,16 @@ class Gui:
                 return poly.id
         return None
 
+    def upload_csv(self):
+        pass
+
+    def upload_shapefile(self):
+        pass
+
     def on_click(self, event):
         if event.inaxes is not None:
             x = event.xdata
             y = event.ydata
-            print(x, y)
             id = self.find_point_id(x, y)
             if id is not None:
                 self.measure_point(id)
