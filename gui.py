@@ -1,3 +1,5 @@
+import threading
+from queue import Queue
 from typing import Optional
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
@@ -12,19 +14,26 @@ import tkinter as tk
 
 class Gui:
     def __init__(self):
+        self.init_program_data()
+        self.init_ui()
+
+    def init_program_data(self):
         self.program_data = \
-            ProgramData(  #TODO input data from user
+            ProgramData(  # TODO input data from user
                 'example-data.csv',
                 'input_map',
                 'output_results',
                 'map',
-                '/dev/pts/3',
+                '/dev/pts/2',
                 115200,
                 10,
                 100,
                 100
             )
+
+    def init_ui(self):
         self.root = tk.Tk()
+        self.queue = Queue()
         self.canvas = None
         self.polygons = []
         self.shapefile_man = ShapefileManager()
@@ -33,7 +42,27 @@ class Gui:
         tk.Button(self.root, text="Upload csv", command=self.upload_csv).pack()
         tk.Button(self.root, text="Upload shapefile", command=self.upload_shapefile).pack()
         self.refresh_plot()
+        self.periodic_call()
         self.root.mainloop()
+
+    def process_incoming(self):
+        """Handle all messages currently in the queue, if any.
+        """
+        while self.queue.qsize():
+            try:
+                msg = self.queue.get()
+                print(msg)
+                id, (rssi, perc) = msg
+                self.shapefile_man.update_map_with_rssi_data('map', id, int(rssi), int(perc))
+                self.refresh_plot()
+            except self.queue.empty():
+                pass
+
+    def periodic_call(self):
+        """Check every 200 ms if there is something new in the queue.
+        """
+        self.process_incoming()
+        self.root.after(200, self.periodic_call)
 
     def refresh_plot(self):
         self.polygons, fig = self.shapefile_man.read_output_rssi('map')
@@ -60,9 +89,7 @@ class Gui:
             )
         result = measurements.measure_point()
         if result:
-            rssi, perc = result
-            self.shapefile_man.update_map_with_rssi_data('map', id, int(rssi), int(perc))
-            self.refresh_plot()
+            self.queue.put((id, result))
 
     def find_point_id(self, x: int, y: int) -> Optional[int]:
         for poly in self.polygons:
@@ -84,7 +111,8 @@ class Gui:
             y = event.ydata
             id = self.find_point_id(x, y)
             if id is not None:
-                self.measure_point(id)
+                self.thread1 = threading.Thread(target=self.measure_point, args=(id,), daemon=True)
+                self.thread1.start()
         else:
             print('Clicked ouside axes bounds but inside plot window')
 
