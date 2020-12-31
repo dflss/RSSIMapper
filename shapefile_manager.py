@@ -20,6 +20,7 @@ def create_raw_shapefile_map_from_csv(csv: str, input_shapefile: str):
             ]])
             w.record(polygon['id'])
 
+
 def create_output_shapefile_map_with_rssi_and_percent_values(input_shapefile: str, output_shapefile: str):
     with shp.Reader(input_shapefile) as r:
         with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
@@ -29,6 +30,7 @@ def create_output_shapefile_map_with_rssi_and_percent_values(input_shapefile: st
             for shaperec in r.iterShapeRecords():
                 w.record(shaperec.record['ID'], 0, 0)
                 w.shape(shaperec.shape)
+
 
 def read_raw_shapefile_map(filename: str) -> List[int]:
     with shp.Reader(filename) as sf:
@@ -42,6 +44,7 @@ def read_raw_shapefile_map(filename: str) -> List[int]:
             ids.append(rec['ID'])
         plt.show()
         return ids
+
 
 def read_output_shapefile_map_with_rssi_values(filename: str):
     def get_color(rssi):
@@ -62,6 +65,7 @@ def read_output_shapefile_map_with_rssi_values(filename: str):
             print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
         plt.show()
 
+
 def read_output_shapefile_map_with_percent_values(filename: str):
     def get_color(perc):
         if perc < 40:
@@ -80,6 +84,7 @@ def read_output_shapefile_map_with_percent_values(filename: str):
             plt.fill_between(x, y, color=get_color(shaperec.record['PERC']))
             print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
         plt.show()
+
 
 def update_output_shapefile_map_with_rssi_values(shapefile: str, id: int, rssi: int, perc: int):
     logging.debug(f"Update id {id} with RSSI {rssi} and {perc}%")

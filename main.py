@@ -73,7 +73,9 @@ def main():
     program_data = parse_cmd_args()
     if program_data.input_csv:
         shapefile_mgr.create_raw_shapefile_map_from_csv(program_data.input_csv, program_data.input_shapefile)
-    shapefile_mgr.create_output_shapefile_map_with_rssi_and_percent_values(program_data.input_shapefile, program_data.output_shapefile)
+    shapefile_mgr.create_output_shapefile_map_with_rssi_and_percent_values(
+        program_data.input_shapefile, program_data.output_shapefile
+    )
     ids = shapefile_mgr.read_raw_shapefile_map(program_data.input_shapefile)
     # display initial map
     shapefile_mgr.read_output_shapefile_map_with_rssi_values(program_data.output_shapefile)
