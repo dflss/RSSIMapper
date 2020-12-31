@@ -12,6 +12,7 @@ class Measurements:
         self.timeout = timeout
 
     def measure_point(self) -> Optional[Tuple[float, float]]:
+        print("Measurement started")
         rssi_values: List[int] = []
         start = time.time()
         while time.time() - start < self.timeout and len(rssi_values) < self.points_number:
@@ -22,6 +23,7 @@ class Measurements:
                 for arg in args:
                     if "RSSI" in arg:
                         rssi = arg.split("=")[1].strip()
+                        print(rssi)
                         try:
                             rssi_values.append(int(rssi))
                         except Exception as ex:

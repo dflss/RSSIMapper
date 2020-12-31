@@ -3,7 +3,6 @@ from typing import Tuple
 
 import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
-# import seaborn as sns  # type: ignore
 import pandas as pd
 
 
