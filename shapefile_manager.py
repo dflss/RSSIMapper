@@ -1,9 +1,18 @@
+from dataclasses import dataclass
 from typing import Tuple
 
 import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
 # import seaborn as sns  # type: ignore
 import pandas as pd
+
+
+
+@dataclass
+class MeasureRect:
+    id: int
+    x: list
+    y:list
 
 
 class ShapefileManager:
@@ -47,14 +56,14 @@ class ShapefileManager:
 
         with shp.Reader(filename) as sf:
             fig = plt.figure()
-            ids = []
+            rects = []
             for shaperec in sf.shapeRecords():
                 x = [i[0] for i in shaperec.shape.points[:]]
                 y = [i[1] for i in shaperec.shape.points[:]]
                 plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']), lw=0.5, edgecolor='black')
-                ids.append(shaperec.record['ID'])
+                rects.append(MeasureRect(shaperec.record['ID'], x, y))
                 print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
-        return ids, fig
+        return rects, fig
 
     def read_output_perc(self, filename: str):
         def get_color(perc):

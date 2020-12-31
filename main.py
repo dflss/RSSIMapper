@@ -74,9 +74,10 @@ def main():
     if program_data.input_csv:
         shapefile_man.write_input_map(program_data.input_csv, program_data.input_shapefile)
     shapefile_man.write_output_map(program_data.input_shapefile, program_data.output_shapefile)
-    ids, fig = shapefile_man.read_output_rssi(program_data.output_shapefile)
+    rects, fig = shapefile_man.read_output_rssi(program_data.output_shapefile)
     # shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, 0, -60, 100)
     # read_output_shapefile(program_data, shapefile_man)
+    ids = [i.id for i in rects]
     perform_measurements(program_data, ids)
     shapefile_man.read_output_rssi(program_data.output_shapefile)
 

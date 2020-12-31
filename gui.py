@@ -1,3 +1,5 @@
+from typing import Optional
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 from shapefile_manager import ShapefileManager
 
@@ -6,10 +8,12 @@ import tkinter as tk
 
 root = tk.Tk()
 canvas = None
+rects = []
 
 
 def refresh_plot(shapefile_man):
-    ids, fig = shapefile_man.read_output_rssi('map')
+    global rects
+    rects, fig = shapefile_man.read_output_rssi('map')
     global canvas
     try:
         canvas.get_tk_widget().pack_forget()
@@ -29,10 +33,22 @@ def measure_point(id):
         refresh_plot(shapefile_man)
 
 
+def find_point_id(x: int, y: int) -> Optional[int]:
+    for rect in rects:
+        print(rect)
+        if x > min(rect.x) and x < max(rect.x) and y > min(rect.y) and y < max(rect.y):
+            return rect.id
+    return None
+
+
 def on_click(event):
     if event.inaxes is not None:
-        print(event.xdata, event.ydata)
-        measure_point(1)
+        x = event.xdata
+        y = event.ydata
+        print(x, y)
+        id = find_point_id(x, y)
+        if id is not None:
+            measure_point(id)
     else:
         print('Clicked ouside axes bounds but inside plot window')
 
