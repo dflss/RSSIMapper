@@ -41,6 +41,8 @@ class Gui:
         tk.Button(self.root, text="Quit", command=self.root.quit).pack()
         tk.Button(self.root, text="Upload csv", command=self.upload_csv).pack()
         tk.Button(self.root, text="Upload shapefile", command=self.upload_shapefile).pack()
+        self.progress_label = tk.Label(self.root, text='text')
+        self.progress_label.pack()
         self.refresh_plot()
         self.periodic_call()
         self.root.mainloop()
@@ -51,6 +53,7 @@ class Gui:
         while self.queue.qsize():
             try:
                 msg = self.queue.get()
+                self.progress_label.config(text="")
                 print(msg)
                 id, (rssi, perc) = msg
                 self.shapefile_man.update_map_with_rssi_data('map', id, int(rssi), int(perc))
@@ -87,6 +90,8 @@ class Gui:
                 points_number=self.program_data.n_points,
                 timeout=self.program_data.measurement_timeout
             )
+        print(f"Measurement started for point {id}")
+        self.progress_label.config(text=f"Measurement started for point {id}")
         result = measurements.measure_point()
         if result:
             self.queue.put((id, result))

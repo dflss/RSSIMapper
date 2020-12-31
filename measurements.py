@@ -12,7 +12,6 @@ class Measurements:
         self.timeout = timeout
 
     def measure_point(self) -> Optional[Tuple[float, float]]:
-        print("Measurement started")
         rssi_values: List[int] = []
         start = time.time()
         while time.time() - start < self.timeout and len(rssi_values) < self.points_number:
