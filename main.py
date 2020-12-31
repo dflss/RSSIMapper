@@ -2,7 +2,7 @@ import argparse
 from typing import List
 
 import shapefile_manager as shapefile_mgr
-from measurements import Measurements
+from measurements_manager import MeasurementsManager
 from program_data import ProgramData
 from serial_connection import SerialConnection
 
@@ -43,8 +43,8 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
             baudrate=program_data.baudrate,
             timeout=program_data.serial_timeout
         )
-    measurements = \
-        Measurements(
+    measurements_mgr = \
+        MeasurementsManager(
             serial_conn=serial_conn,
             points_number=program_data.n_points,
             timeout=program_data.measurement_timeout
@@ -57,7 +57,7 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
         try:
             mp_id = int(user_input)
             if mp_id in ids:
-                result = measurements.measure_point()
+                result = measurements_mgr.measure_point()
                 if result:
                     rssi, perc = result
                     shapefile_mgr.update_output_shapefile_map_with_rssi_values(

@@ -5,7 +5,7 @@ from typing import Optional, Tuple, List
 from serial_connection import SerialConnection
 
 
-class Measurements:
+class MeasurementsManager:
     def __init__(self, serial_conn: SerialConnection, points_number: int, timeout: int):
         self.serial_conn = serial_conn
         self.points_number = points_number
