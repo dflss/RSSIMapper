@@ -6,12 +6,11 @@ import shapefile as shp  # type: ignore
 import pandas as pd
 
 
-
 @dataclass
 class MeasureRect:
     id: int
     x: list
-    y:list
+    y: list
 
 
 class ShapefileManager:
