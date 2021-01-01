@@ -1,4 +1,5 @@
 import threading
+import logging
 from queue import Queue
 from typing import Optional
 
@@ -12,10 +13,22 @@ from shapefile_manager import ShapefileManager
 import tkinter as tk
 
 
-class Gui:
+class GUI:
     def __init__(self):
         self.init_program_data()
         self.init_ui()
+        self.serial_conn = \
+            SerialConnection(
+                port=self.program_data.port,
+                baudrate=self.program_data.baudrate,
+                timeout=self.program_data.serial_timeout
+            )
+        self.measurements = \
+            Measurements(
+                serial_conn=self.serial_conn,
+                points_number=self.program_data.n_points,
+                timeout=self.program_data.measurement_timeout
+            )
 
     def init_program_data(self):
         self.program_data = \
@@ -44,28 +57,27 @@ class Gui:
         self.progress_label = tk.Label(self.root, text='text')
         self.progress_label.pack()
         self.refresh_plot()
-        self.periodic_call()
+        self.check_queue()
         self.root.mainloop()
 
-    def process_incoming(self):
+    def process_incoming_queue_messages(self):
         """Handle all messages currently in the queue, if any.
         """
         while self.queue.qsize():
             try:
                 msg = self.queue.get()
                 self.progress_label.config(text="")
-                print(msg)
                 id, (rssi, perc) = msg
                 self.shapefile_man.update_map_with_rssi_data('map', id, int(rssi), int(perc))
                 self.refresh_plot()
             except self.queue.empty():
                 pass
 
-    def periodic_call(self):
+    def check_queue(self):
         """Check every 200 ms if there is something new in the queue.
         """
-        self.process_incoming()
-        self.root.after(200, self.periodic_call)
+        self.process_incoming_queue_messages()
+        self.root.after(200, self.check_queue)
 
     def refresh_plot(self):
         self.polygons, fig = self.shapefile_man.read_output_rssi('map')
@@ -78,21 +90,9 @@ class Gui:
         self.canvas.mpl_connect('button_press_event', self.on_click)
 
     def measure_point(self, id: int):
-        serial_conn = \
-            SerialConnection(
-                port=self.program_data.port,
-                baudrate=self.program_data.baudrate,
-                timeout=self.program_data.serial_timeout
-            )
-        measurements = \
-            Measurements(
-                serial_conn=serial_conn,
-                points_number=self.program_data.n_points,
-                timeout=self.program_data.measurement_timeout
-            )
-        print(f"Measurement started for point {id}")
+        logging.debug(f"Measurement started for point {id}")
         self.progress_label.config(text=f"Measurement started for point {id}")
-        result = measurements.measure_point()
+        result = self.measurements.measure_point()
         if result:
             self.queue.put((id, result))
 
@@ -116,14 +116,14 @@ class Gui:
             y = event.ydata
             id = self.find_point_id(x, y)
             if id is not None:
-                self.thread1 = threading.Thread(target=self.measure_point, args=(id,), daemon=True)
-                self.thread1.start()
+                self.thread = threading.Thread(target=self.measure_point, args=(id,), daemon=True)
+                self.thread.start()
         else:
-            print('Clicked ouside axes bounds but inside plot window')
+            logging.debug('Clicked ouside axes bounds but inside plot window')
 
 
 def main():
-    Gui()
+    GUI()
 
 
 if __name__ == '__main__':

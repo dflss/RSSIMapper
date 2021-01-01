@@ -1,5 +1,6 @@
 import statistics
 import time
+import logging
 from typing import Optional, Tuple, List
 
 from serial_connection import SerialConnection
@@ -22,7 +23,7 @@ class Measurements:
                 for arg in args:
                     if "RSSI" in arg:
                         rssi = arg.split("=")[1].strip()
-                        print(rssi)
+                        logging.debug(f"Read RSSI value from serial: {rssi}")
                         try:
                             rssi_values.append(int(rssi))
                         except Exception as ex:
