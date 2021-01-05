@@ -6,7 +6,7 @@ import shapefile as shp  # type: ignore
 import pandas as pd
 
 
-def create_raw_shapefile_map_from_csv(csv: str, input_shapefile: str):
+def create_raw_shapefile_from_csv(csv: str, input_shapefile: str):
     data = pd.read_csv(csv)
     with shp.Writer(input_shapefile, shapeType=shp.POLYGON) as w:
         w.field('ID', 'N')
@@ -21,7 +21,7 @@ def create_raw_shapefile_map_from_csv(csv: str, input_shapefile: str):
             w.record(polygon['id'])
 
 
-def create_output_shapefile_map_with_rssi_and_percent_values(input_shapefile: str, output_shapefile: str):
+def create_output_shapefile(input_shapefile: str, output_shapefile: str):
     with shp.Reader(input_shapefile) as r:
         with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
@@ -32,7 +32,7 @@ def create_output_shapefile_map_with_rssi_and_percent_values(input_shapefile: st
                 w.shape(shaperec.shape)
 
 
-def read_raw_shapefile_map(filename: str) -> List[int]:
+def read_raw_shapefile(filename: str) -> List[int]:
     with shp.Reader(filename) as sf:
         ids = []
         plt.figure()
@@ -46,7 +46,7 @@ def read_raw_shapefile_map(filename: str) -> List[int]:
         return ids
 
 
-def read_output_shapefile_map_with_rssi_values(filename: str):
+def read_output_shapefile_with_rssi_values(filename: str):
     def get_color(rssi):
         if rssi < -90:
             return 'blue'
@@ -66,7 +66,7 @@ def read_output_shapefile_map_with_rssi_values(filename: str):
         plt.show()
 
 
-def read_output_shapefile_map_with_percent_values(filename: str):
+def read_output_shapefile_with_percent_values(filename: str):
     def get_color(perc):
         if perc < 40:
             return 'blue'
@@ -86,7 +86,7 @@ def read_output_shapefile_map_with_percent_values(filename: str):
         plt.show()
 
 
-def update_output_shapefile_map_with_rssi_values(shapefile: str, id: int, rssi: int, perc: int):
+def update_output_shapefile_with_rssi_values(shapefile: str, id: int, rssi: int, perc: int):
     logging.debug(f"Update id {id} with RSSI {rssi} and {perc}%")
     with shp.Reader(shapefile) as r:
         records = list(r.iterShapeRecords())

@@ -60,7 +60,7 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
                 result = measurements_mgr.measure_point()
                 if result:
                     rssi, perc = result
-                    shapefile_mgr.update_output_shapefile_map_with_rssi_values(
+                    shapefile_mgr.update_output_shapefile_with_rssi_values(
                         program_data.output_shapefile, mp_id, int(rssi), int(perc)
                     )
             else:
@@ -72,16 +72,14 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
 def main():
     program_data = parse_cmd_args()
     if program_data.input_csv:
-        shapefile_mgr.create_raw_shapefile_map_from_csv(program_data.input_csv, program_data.input_shapefile)
-    shapefile_mgr.create_output_shapefile_map_with_rssi_and_percent_values(
-        program_data.input_shapefile, program_data.output_shapefile
-    )
-    ids = shapefile_mgr.read_raw_shapefile_map(program_data.input_shapefile)
+        shapefile_mgr.create_raw_shapefile_from_csv(program_data.input_csv, program_data.input_shapefile)
+    shapefile_mgr.create_output_shapefile(program_data.input_shapefile, program_data.output_shapefile)
+    ids = shapefile_mgr.read_raw_shapefile(program_data.input_shapefile)
     # display initial map
-    shapefile_mgr.read_output_shapefile_map_with_rssi_values(program_data.output_shapefile)
+    shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
     perform_measurements(program_data, ids)
     # display map with the results of measurements
-    shapefile_mgr.read_output_shapefile_map_with_rssi_values(program_data.output_shapefile)
+    shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
 
 
 if __name__ == '__main__':
