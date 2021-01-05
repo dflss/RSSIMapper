@@ -22,3 +22,4 @@ class MeasurementsMap:
                 shaperec.record['RSSI'] = rssi
                 shaperec.record['PERC'] = perc
                 return shaperec
+        raise IndexError(f"Given id ({id}) was not found")
