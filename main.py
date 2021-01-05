@@ -1,10 +1,11 @@
 import argparse
 
-import shapefile_manager as shapefile_mgr
+from map_plotter import MapPlotter
 from measurements_manager import MeasurementsManager
 from measurements_map import MeasurementsMap
 from program_data import ProgramData
 from serial_connection import SerialConnection
+from shapefile_manager import ShapefileManager
 
 
 def parse_cmd_args() -> ProgramData:
@@ -69,16 +70,18 @@ def perform_measurements(program_data: ProgramData, measurements_map: Measuremen
 
 def main():
     program_data = parse_cmd_args()
-    if program_data.input_csv:
-        shapefile_mgr.create_raw_shapefile_from_csv(program_data.input_csv, program_data.input_shapefile)
-    shapefile_mgr.create_output_shapefile(program_data.input_shapefile, program_data.output_shapefile)
-    measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile(program_data.output_shapefile))
-    # display initial output map
-    measurements_map.display_rssi_values()
+    shapefile_mgr = \
+        ShapefileManager(
+            program_data.input_shapefile,
+            program_data.output_shapefile,
+            program_data.input_csv
+        )
+    measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile())
+    map_plotter = MapPlotter(measurements_map)
+    map_plotter.display_with_rssi_values()  # display initial output map
     perform_measurements(program_data, measurements_map)
-    # display output map with the results of measurements
-    measurements_map.display_rssi_values()
-    shapefile_mgr.save_shapefile(program_data.output_shapefile, measurements_map.shape_records)
+    map_plotter.display_with_rssi_values()   # display output map with the results of measurements
+    shapefile_mgr.update_shapefile(measurements_map.shape_records)
 
 
 if __name__ == '__main__':
