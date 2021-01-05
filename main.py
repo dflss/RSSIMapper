@@ -74,11 +74,13 @@ def main():
     if program_data.input_csv:
         shapefile_mgr.create_raw_shapefile_from_csv(program_data.input_csv, program_data.input_shapefile)
     shapefile_mgr.create_output_shapefile(program_data.input_shapefile, program_data.output_shapefile)
-    ids = shapefile_mgr.read_raw_shapefile(program_data.input_shapefile)
-    # display initial map
+    ids = shapefile_mgr.get_shapefile_ids(program_data.input_shapefile)
+    # display raw map
+    shapefile_mgr.display_map(program_data.input_shapefile)
+    # display initial output map
     shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
     perform_measurements(program_data, ids)
-    # display map with the results of measurements
+    # display output map with the results of measurements
     shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
 
 

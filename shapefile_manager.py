@@ -32,18 +32,22 @@ def create_output_shapefile(input_shapefile: str, output_shapefile: str):
                 w.shape(shaperec.shape)
 
 
-def read_raw_shapefile(filename: str) -> List[int]:
+def get_shapefile_ids(filename: str) -> List[int]:
     with shp.Reader(filename) as sf:
         ids = []
+        for rec in sf.records():
+            ids.append(rec['ID'])
+        return ids
+
+
+def display_map(filename: str):
+    with shp.Reader(filename) as sf:
         plt.figure()
         for shape in sf.shapeRecords():
             x = [i[0] for i in shape.shape.points[:]]
             y = [i[1] for i in shape.shape.points[:]]
             plt.plot(x, y)
-        for rec in sf.records():
-            ids.append(rec['ID'])
         plt.show()
-        return ids
 
 
 def read_output_shapefile_with_rssi_values(filename: str):
