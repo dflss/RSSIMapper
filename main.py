@@ -1,8 +1,9 @@
 import argparse
-import matplotlib.pyplot as plt
 
-from typing import List
-from measurements import Measurements
+from map_plotter import MapPlotter
+from measurements_manager import MeasurementsManager
+from measurements_map import MeasurementsMap
+
 from program_data import ProgramData
 from serial_connection import SerialConnection
 from shapefile_manager import ShapefileManager
@@ -37,15 +38,15 @@ def parse_cmd_args() -> ProgramData:
         )
 
 
-def perform_measurements(program_data: ProgramData, ids: List[int]):
+def perform_measurements(program_data: ProgramData, measurements_map: MeasurementsMap):
     serial_conn = \
         SerialConnection(
             port=program_data.port,
             baudrate=program_data.baudrate,
             timeout=program_data.serial_timeout
         )
-    measurements = \
-        Measurements(
+    measurements_mgr = \
+        MeasurementsManager(
             serial_conn=serial_conn,
             points_number=program_data.n_points,
             timeout=program_data.measurement_timeout
@@ -57,12 +58,11 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
             return
         try:
             mp_id = int(user_input)
-            if mp_id in ids:
-                result = measurements.measure_point()
+            if mp_id in measurements_map.ids:
+                result = measurements_mgr.measure_point()
                 if result:
                     rssi, perc = result
-                    shapefile_man = ShapefileManager()
-                    shapefile_man.update_map_with_rssi_data(program_data.output_shapefile, mp_id, int(rssi), int(perc))
+                    measurements_map.update_map_with_rssi_values(mp_id, int(rssi), int(perc))
             else:
                 print("This id does not exist in the given shapefile.")
         except ValueError:
@@ -71,16 +71,18 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
 
 def main():
     program_data = parse_cmd_args()
-    shapefile_man = ShapefileManager()
-    if program_data.input_csv:
-        shapefile_man.write_input_map(program_data.input_csv, program_data.input_shapefile)
-    shapefile_man.write_output_map(program_data.input_shapefile, program_data.output_shapefile)
-    rects, fig = shapefile_man.read_output_rssi(program_data.output_shapefile)
-    plt.show()
-    ids = [i.id for i in rects]
-    perform_measurements(program_data, ids)
-    shapefile_man.read_output_rssi(program_data.output_shapefile)
-    plt.show()
+    shapefile_mgr = \
+        ShapefileManager(
+            program_data.input_shapefile,
+            program_data.output_shapefile,
+            program_data.input_csv
+        )
+    measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile())
+    map_plotter = MapPlotter(measurements_map)
+    map_plotter.display_with_rssi_values()  # display initial output map
+    perform_measurements(program_data, measurements_map)
+    map_plotter.display_with_rssi_values()   # display output map with the results of measurements
+    shapefile_mgr.update_shapefile(measurements_map.shape_records)
 
 
 if __name__ == '__main__':

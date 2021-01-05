@@ -1,23 +1,19 @@
-from dataclasses import dataclass
-from typing import Tuple
+from typing import List, Optional
 
-import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
 import pandas as pd
 
 
-@dataclass
-class MeasureRect:
-    id: int
-    x: list
-    y: list
-
-
 class ShapefileManager:
+    def __init__(self, input_shapefile_path: str, output_shapefile_path: str, csv_path: Optional[str]):
+        self.output_shapefile_path = output_shapefile_path
+        if csv_path is not None:
+            self._create_raw_shapefile_from_csv(csv_path, input_shapefile_path)
+        self._create_output_shapefile(input_shapefile_path)
 
-    def write_input_map(self, csv: str, input_shapefile: str):
-        data = pd.read_csv(csv)
-        with shp.Writer(input_shapefile, shapeType=shp.POLYGON) as w:
+    def _create_raw_shapefile_from_csv(self, csv_path, input_shapefile_path):
+        data = pd.read_csv(csv_path)
+        with shp.Writer(input_shapefile_path, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
             for i, polygon in data.iterrows():
                 w.poly([[
@@ -29,9 +25,9 @@ class ShapefileManager:
                 ]])
                 w.record(polygon['id'])
 
-    def write_output_map(self, input_shapefile: str, output_shapefile: str):
-        with shp.Reader(input_shapefile) as r:
-            with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
+    def _create_output_shapefile(self, input_shapefile_path):
+        with shp.Reader(input_shapefile_path) as r:
+            with shp.Writer(self.output_shapefile_path, shapeType=shp.POLYGON) as w:
                 w.field('ID', 'N')
                 w.field('RSSI', 'N')
                 w.field('PERC', 'N')
@@ -39,60 +35,15 @@ class ShapefileManager:
                     w.record(shaperec.record['ID'], 0, 0)
                     w.shape(shaperec.shape)
 
-    def read_output_rssi(self, filename: str) -> Tuple[list, plt.Figure]:
-        def get_color(rssi):
-            if rssi == 0:
-                return 'grey'
-            if rssi < -90:
-                return 'blue'
-            elif rssi < -70:
-                return 'green'
-            elif rssi < -50:
-                return 'yellow'
-            else:
-                return 'red'
+    def read_shapefile(self) -> List[shp.ShapeRecord]:
+        with shp.Reader(self.output_shapefile_path) as r:
+            return list(r.iterShapeRecords())
 
-        with shp.Reader(filename) as sf:
-            fig = plt.figure()
-            rects = []
-            for shaperec in sf.shapeRecords():
-                x = [i[0] for i in shaperec.shape.points[:]]
-                y = [i[1] for i in shaperec.shape.points[:]]
-                plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']), lw=0.5, edgecolor='black')
-                rects.append(MeasureRect(shaperec.record['ID'], x, y))
-                print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
-        return rects, fig
-
-    def read_output_perc(self, filename: str):
-        def get_color(perc):
-            if perc < 40:
-                return 'blue'
-            elif perc < 60:
-                return 'green'
-            elif perc < 80:
-                return 'yellow'
-            else:
-                return 'red'
-        with shp.Reader(filename) as sf:
-            plt.figure()
-            for shaperec in sf.shapeRecords():
-                x = [i[0] for i in shaperec.shape.points[:]]
-                y = [i[1] for i in shaperec.shape.points[:]]
-                plt.fill_between(x, y, color=get_color(shaperec.record['PERC']))
-                print(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
-            plt.show()
-
-    def update_map_with_rssi_data(self, shapefile: str, id: int, rssi: int, perc: int):
-        print(f"Update id {id} with RSSI {rssi} and {perc}%")
-        with shp.Reader(shapefile) as r:
-            records = list(r.iterShapeRecords())
-        with shp.Writer(shapefile, shapeType=shp.POLYGON) as w:
+    def update_shapefile(self, shape_records: List[shp.ShapeRecord]):
+        with shp.Writer(self.output_shapefile_path, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
             w.field('RSSI', 'N')
             w.field('PERC', 'N')
-            for shaperec in records:
-                if shaperec.record['ID'] == id:
-                    w.record(id, rssi, perc)
-                else:
-                    w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
+            for shaperec in shape_records:
+                w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
                 w.shape(shaperec.shape)

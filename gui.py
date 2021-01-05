@@ -5,7 +5,9 @@ from typing import Optional
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 
-from measurements import Measurements
+from map_plotter import MapPlotter
+from measurements_manager import MeasurementsManager
+from measurements_map import MeasurementsMap
 from program_data import ProgramData
 from serial_connection import SerialConnection
 from shapefile_manager import ShapefileManager
@@ -17,18 +19,6 @@ class GUI:
     def __init__(self):
         self.init_program_data()
         self.init_ui()
-        self.serial_conn = \
-            SerialConnection(
-                port=self.program_data.port,
-                baudrate=self.program_data.baudrate,
-                timeout=self.program_data.serial_timeout
-            )
-        self.measurements = \
-            Measurements(
-                serial_conn=self.serial_conn,
-                points_number=self.program_data.n_points,
-                timeout=self.program_data.measurement_timeout
-            )
 
     def init_program_data(self):
         self.program_data = \
@@ -37,7 +27,7 @@ class GUI:
                 'input_map',
                 'output_results',
                 'map',
-                '/dev/pts/2',
+                '/dev/pts/3',
                 115200,
                 10,
                 100,
@@ -48,9 +38,26 @@ class GUI:
         self.root = tk.Tk()
         self.queue = Queue()
         self.canvas = None
-        self.polygons = []
-        self.shapefile_man = ShapefileManager()
-        self.shapefile_man.write_output_map(self.program_data.input_shapefile, self.program_data.output_shapefile)
+        self.serial_conn = \
+            SerialConnection(
+                port=self.program_data.port,
+                baudrate=self.program_data.baudrate,
+                timeout=self.program_data.serial_timeout
+            )
+        self.measurements_mgr = \
+            MeasurementsManager(
+                serial_conn=self.serial_conn,
+                points_number=self.program_data.n_points,
+                timeout=self.program_data.measurement_timeout
+            )
+        shapefile_mgr = \
+            ShapefileManager(
+                self.program_data.input_shapefile,
+                self.program_data.output_shapefile,
+                self.program_data.input_csv
+            )
+        self.measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile())
+        self.map_plotter = MapPlotter(self.measurements_map)
         tk.Button(self.root, text="Quit", command=self.root.quit).pack()
         tk.Button(self.root, text="Upload csv", command=self.upload_csv).pack()
         tk.Button(self.root, text="Upload shapefile", command=self.upload_shapefile).pack()
@@ -68,7 +75,7 @@ class GUI:
                 msg = self.queue.get()
                 self.progress_label.config(text="")
                 id, (rssi, perc) = msg
-                self.shapefile_man.update_map_with_rssi_data('map', id, int(rssi), int(perc))
+                self.measurements_map.update_map_with_rssi_values(id, int(rssi), int(perc))
                 self.refresh_plot()
             except self.queue.empty():
                 pass
@@ -80,7 +87,7 @@ class GUI:
         self.root.after(200, self.check_queue)
 
     def refresh_plot(self):
-        self.polygons, fig = self.shapefile_man.read_output_rssi('map')
+        fig = self.map_plotter.display_with_rssi_values()
         try:
             self.canvas.get_tk_widget().pack_forget()
         except AttributeError:
@@ -92,14 +99,14 @@ class GUI:
     def measure_point(self, id: int):
         logging.debug(f"Measurement started for point {id}")
         self.progress_label.config(text=f"Measurement started for point {id}")
-        result = self.measurements.measure_point()
+        result = self.measurements_mgr.measure_point()
         if result:
             self.queue.put((id, result))
 
     def find_point_id(self, x: int, y: int) -> Optional[int]:
-        for poly in self.polygons:
-            if x > min(poly.x) and x < max(poly.x) and y > min(poly.y) and y < max(poly.y):
-                return poly.id
+        for record in self.measurements_map.records:
+            if x > min(record.x) and x < max(record.x) and y > min(record.y) and y < max(record.y):
+                return record.id
         return None
 
     def upload_csv(self):
@@ -114,6 +121,7 @@ class GUI:
         if event.inaxes is not None:
             x = event.xdata
             y = event.ydata
+            print(x, y)
             id = self.find_point_id(x, y)
             if id is not None:
                 self.thread = threading.Thread(target=self.measure_point, args=(id,), daemon=True)
