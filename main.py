@@ -1,8 +1,8 @@
 import argparse
-from typing import List
 
 import shapefile_manager as shapefile_mgr
 from measurements_manager import MeasurementsManager
+from measurements_map import MeasurementsMap
 from program_data import ProgramData
 from serial_connection import SerialConnection
 
@@ -36,7 +36,7 @@ def parse_cmd_args() -> ProgramData:
         )
 
 
-def perform_measurements(program_data: ProgramData, ids: List[int]):
+def perform_measurements(program_data: ProgramData, measurements_map: MeasurementsMap):
     serial_conn = \
         SerialConnection(
             port=program_data.port,
@@ -56,13 +56,11 @@ def perform_measurements(program_data: ProgramData, ids: List[int]):
             return
         try:
             mp_id = int(user_input)
-            if mp_id in ids:
+            if mp_id in measurements_map.ids:
                 result = measurements_mgr.measure_point()
                 if result:
                     rssi, perc = result
-                    shapefile_mgr.update_output_shapefile_with_rssi_values(
-                        program_data.output_shapefile, mp_id, int(rssi), int(perc)
-                    )
+                    measurements_map.update_map_with_rssi_values(mp_id, int(rssi), int(perc))
             else:
                 print("This id does not exist in the given shapefile.")
         except ValueError:
@@ -74,14 +72,15 @@ def main():
     if program_data.input_csv:
         shapefile_mgr.create_raw_shapefile_from_csv(program_data.input_csv, program_data.input_shapefile)
     shapefile_mgr.create_output_shapefile(program_data.input_shapefile, program_data.output_shapefile)
-    ids = shapefile_mgr.get_shapefile_ids(program_data.input_shapefile)
+    measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile(program_data.output_shapefile))
     # display raw map
-    shapefile_mgr.display_map(program_data.input_shapefile)
+    measurements_map.display_map()
     # display initial output map
-    shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
-    perform_measurements(program_data, ids)
+    measurements_map.display_map_with_rssi_values()
+    perform_measurements(program_data, measurements_map)
     # display output map with the results of measurements
-    shapefile_mgr.read_output_shapefile_with_rssi_values(program_data.output_shapefile)
+    measurements_map.display_map_with_rssi_values()
+    shapefile_mgr.save_shapefile(program_data.output_shapefile, measurements_map.shapeRecords)
 
 
 if __name__ == '__main__':
