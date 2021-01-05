@@ -1,16 +1,19 @@
-from typing import List
+from typing import List, Optional
 
-import matplotlib.pyplot as plt
 import shapefile as shp  # type: ignore
-# import seaborn as sns  # type: ignore
 import pandas as pd
 
 
 class ShapefileManager:
+    def __init__(self, input_shapefile_path: str, output_shapefile_path: str, csv_path: Optional[str]):
+        self.output_shapefile_path = output_shapefile_path
+        if csv_path is not None:
+            self._create_raw_shapefile_from_csv(csv_path, input_shapefile_path)
+        self._create_output_shapefile(input_shapefile_path)
 
-    def write(self, csv: str, shapefile: str):
-        data = pd.read_csv(csv)
-        with shp.Writer(shapefile, shapeType=shp.POLYGON) as w:
+    def _create_raw_shapefile_from_csv(self, csv_path, input_shapefile_path):
+        data = pd.read_csv(csv_path)
+        with shp.Writer(input_shapefile_path, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
             for i, polygon in data.iterrows():
                 w.poly([[
@@ -22,15 +25,25 @@ class ShapefileManager:
                 ]])
                 w.record(polygon['id'])
 
-    def read(self, filename: str) -> List[int]:
-        sf = shp.Reader(filename)
-        ids = []
-        plt.figure()
-        for shape in sf.shapeRecords():
-            x = [i[0] for i in shape.shape.points[:]]
-            y = [i[1] for i in shape.shape.points[:]]
-            plt.plot(x, y)
-        for rec in sf.records():
-            ids.append(rec['ID'])
-        plt.show()
-        return ids
+    def _create_output_shapefile(self, input_shapefile_path):
+        with shp.Reader(input_shapefile_path) as r:
+            with shp.Writer(self.output_shapefile_path, shapeType=shp.POLYGON) as w:
+                w.field('ID', 'N')
+                w.field('RSSI', 'N')
+                w.field('PERC', 'N')
+                for shaperec in r.iterShapeRecords():
+                    w.record(shaperec.record['ID'], 0, 0)
+                    w.shape(shaperec.shape)
+
+    def read_shapefile(self) -> List[shp.ShapeRecord]:
+        with shp.Reader(self.output_shapefile_path) as r:
+            return list(r.iterShapeRecords())
+
+    def update_shapefile(self, shape_records: List[shp.ShapeRecord]):
+        with shp.Writer(self.output_shapefile_path, shapeType=shp.POLYGON) as w:
+            w.field('ID', 'N')
+            w.field('RSSI', 'N')
+            w.field('PERC', 'N')
+            for shaperec in shape_records:
+                w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
+                w.shape(shaperec.shape)
