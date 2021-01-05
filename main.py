@@ -1,5 +1,7 @@
 import argparse
+import sys
 
+from controller import Controller
 from map_plotter import MapPlotter
 from measurements_manager import MeasurementsManager
 from measurements_map import MeasurementsMap
@@ -69,7 +71,11 @@ def perform_measurements(program_data: ProgramData, measurements_map: Measuremen
             print("Measurement point id must be an integer value.")
 
 
-def main():
+def run_gui():
+    controller = Controller()
+
+
+def run_cli():
     program_data = parse_cmd_args()
     shapefile_mgr = \
         ShapefileManager(
@@ -81,8 +87,15 @@ def main():
     map_plotter = MapPlotter(measurements_map)
     map_plotter.display_with_rssi_values()  # display initial output map
     perform_measurements(program_data, measurements_map)
-    map_plotter.display_with_rssi_values()   # display output map with the results of measurements
+    map_plotter.display_with_rssi_values()  # display output map with the results of measurements
     shapefile_mgr.update_shapefile(measurements_map.shape_records)
+
+
+def main():
+    if not len(sys.argv) > 1:
+        run_gui()
+    else:
+        run_cli()
 
 
 if __name__ == '__main__':

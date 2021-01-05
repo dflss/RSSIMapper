@@ -15,7 +15,7 @@ from shapefile_manager import ShapefileManager
 import tkinter as tk
 
 
-class GUI:
+class View:
     def __init__(self):
         self.init_program_data()
         self.init_ui()
@@ -128,11 +128,3 @@ class GUI:
                 self.thread.start()
         else:
             logging.debug('Clicked ouside axes bounds but inside plot window')
-
-
-def main():
-    GUI()
-
-
-if __name__ == '__main__':
-    main()
