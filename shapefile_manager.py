@@ -4,9 +4,9 @@ import shapefile as shp  # type: ignore
 import pandas as pd
 
 
-def create_raw_shapefile_from_csv(csv: str, input_shapefile: str):
+def create_raw_shapefile_from_csv(csv: str, input_shapefile_name: str):
     data = pd.read_csv(csv)
-    with shp.Writer(input_shapefile, shapeType=shp.POLYGON) as w:
+    with shp.Writer(input_shapefile_name, shapeType=shp.POLYGON) as w:
         w.field('ID', 'N')
         for i, polygon in data.iterrows():
             w.poly([[
@@ -19,9 +19,9 @@ def create_raw_shapefile_from_csv(csv: str, input_shapefile: str):
             w.record(polygon['id'])
 
 
-def create_output_shapefile(input_shapefile: str, output_shapefile: str):
-    with shp.Reader(input_shapefile) as r:
-        with shp.Writer(output_shapefile, shapeType=shp.POLYGON) as w:
+def create_output_shapefile(input_shapefile_name: str, output_shapefile_name: str):
+    with shp.Reader(input_shapefile_name) as r:
+        with shp.Writer(output_shapefile_name, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
             w.field('RSSI', 'N')
             w.field('PERC', 'N')
@@ -30,16 +30,16 @@ def create_output_shapefile(input_shapefile: str, output_shapefile: str):
                 w.shape(shaperec.shape)
 
 
-def read_shapefile(shapefile: str) -> List[shp.ShapeRecord]:
-    with shp.Reader(shapefile) as r:
+def read_shapefile(shapefile_name: str) -> List[shp.ShapeRecord]:
+    with shp.Reader(shapefile_name) as r:
         return list(r.iterShapeRecords())
 
 
-def save_shapefile(shapefile: str, shapeRecords: List[shp.ShapeRecord]):
-    with shp.Writer(shapefile, shapeType=shp.POLYGON) as w:
+def save_shapefile(shapefile_name: str, shape_records: List[shp.ShapeRecord]):
+    with shp.Writer(shapefile_name, shapeType=shp.POLYGON) as w:
         w.field('ID', 'N')
         w.field('RSSI', 'N')
         w.field('PERC', 'N')
-        for shaperec in shapeRecords:
+        for shaperec in shape_records:
             w.record(shaperec.record['ID'], shaperec.record['RSSI'], shaperec.record['PERC'])
             w.shape(shaperec.shape)

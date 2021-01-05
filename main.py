@@ -73,14 +73,12 @@ def main():
         shapefile_mgr.create_raw_shapefile_from_csv(program_data.input_csv, program_data.input_shapefile)
     shapefile_mgr.create_output_shapefile(program_data.input_shapefile, program_data.output_shapefile)
     measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile(program_data.output_shapefile))
-    # display raw map
-    measurements_map.display_map()
     # display initial output map
-    measurements_map.display_map_with_rssi_values()
+    measurements_map.display_rssi_values()
     perform_measurements(program_data, measurements_map)
     # display output map with the results of measurements
-    measurements_map.display_map_with_rssi_values()
-    shapefile_mgr.save_shapefile(program_data.output_shapefile, measurements_map.shapeRecords)
+    measurements_map.display_rssi_values()
+    shapefile_mgr.save_shapefile(program_data.output_shapefile, measurements_map.shape_records)
 
 
 if __name__ == '__main__':
