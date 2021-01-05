@@ -72,7 +72,7 @@ def perform_measurements(program_data: ProgramData, measurements_map: Measuremen
 
 
 def run_gui():
-    controller = Controller()
+    Controller()
 
 
 def run_cli():
