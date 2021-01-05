@@ -77,7 +77,7 @@ class Controller:
         self.root.after(200, self.check_queue)
 
     def refresh_plot(self):
-        fig = self.map_plotter.display_with_rssi_values()
+        fig = self.map_plotter.create_map_with_rssi_values()
         self.view.refresh_plot(fig, self.on_map_click)
 
     def find_point_id(self, x: int, y: int) -> Optional[int]:

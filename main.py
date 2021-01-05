@@ -85,9 +85,11 @@ def run_cli():
         )
     measurements_map = MeasurementsMap(shapefile_mgr.read_shapefile())
     map_plotter = MapPlotter(measurements_map)
-    map_plotter.display_with_rssi_values()  # display initial output map
+    map_plotter.create_map_with_rssi_values()  # create and display initial output map
+    map_plotter.display()
     perform_measurements(program_data, measurements_map)
-    map_plotter.display_with_rssi_values()  # display output map with the results of measurements
+    map_plotter.create_map_with_rssi_values()  # display output map with the results of measurements
+    map_plotter.display()
     shapefile_mgr.update_shapefile(measurements_map.shape_records)
 
 
