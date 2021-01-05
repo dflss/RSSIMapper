@@ -1,8 +1,9 @@
-import logging
 from dataclasses import dataclass
 from typing import List
 
 import shapefile as shp  # type: ignore
+
+from log import logger
 
 
 @dataclass
@@ -33,7 +34,7 @@ class MeasurementsMap:
         return records
 
     def update_map_with_rssi_values(self, id: int, rssi: int, perc: int) -> shp.ShapeRecord:
-        logging.debug(f"Update id {id} with RSSI {rssi} and {perc}%")
+        logger.debug(f"Update id {id} with RSSI {rssi} and {perc}%")
         for shaperec in self.shape_records:
             if shaperec.record['ID'] == id:
                 shaperec.record['RSSI'] = rssi

@@ -1,9 +1,9 @@
-import logging
 import threading
 import tkinter as tk
 from queue import Queue
 from typing import Optional
 
+from log import logger
 from map_plotter import MapPlotter
 from measurements_manager import MeasurementsManager
 from measurements_map import MeasurementsMap
@@ -87,7 +87,7 @@ class Controller:
         return None
 
     def measure_point(self, id: int):
-        logging.debug(f"Measurement started for point {id}")
+        logger.debug(f"Measurement started for point {id}")
         self.view.update_measurement_progress_label(id)
         result = self.measurements_mgr.measure_point()
         if result:
@@ -97,10 +97,10 @@ class Controller:
         if event.inaxes is not None:
             x = event.xdata
             y = event.ydata
-            logging.debug(f"Clicked plot: {x}, {y}")
+            logger.debug(f"Clicked plot: {x}, {y}")
             id = self.find_point_id(x, y)
             if id is not None:
                 self.thread = threading.Thread(target=self.measure_point, args=(id,), daemon=True)
                 self.thread.start()
         else:
-            logging.debug('Clicked outside axes bounds but inside plot window')
+            logger.debug('Clicked outside axes bounds but inside plot window')
