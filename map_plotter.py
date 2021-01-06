@@ -7,9 +7,6 @@ class MapPlotter:
     def __init__(self, map: MeasurementsMap):
         self.map = map
 
-    def display(self):
-        plt.show()
-
     def create_raw_map(self):
         fig = plt.figure()
         for shape in self.map.shape_records:
@@ -20,7 +17,9 @@ class MapPlotter:
 
     def create_map_with_rssi_values(self):
         def get_color(rssi):
-            if rssi < -90:
+            if rssi == 0:
+                return 'white'
+            elif rssi < -90:
                 return 'blue'
             elif rssi < -70:
                 return 'green'
@@ -38,7 +37,9 @@ class MapPlotter:
 
     def create_map_with_percent_values(self):
         def get_color(perc):
-            if perc < 40:
+            if perc == 0:
+                return 'white'
+            elif perc < 40:
                 return 'blue'
             elif perc < 60:
                 return 'green'
