@@ -1,12 +1,15 @@
+import matplotlib.pyplot as plt
+
 from map_plotter import MapPlotter
 from measurements_manager import MeasurementsManager
 from measurements_map import MeasurementsMap
+from program_data import ProgramData
 from serial_connection import SerialConnection
 from shapefile_manager import ShapefileManager
 
 
 class Model:
-    def set_program_data(self, program_data):
+    def set_program_data(self, program_data: ProgramData):
         self.program_data = program_data
         self.serial_conn = \
             SerialConnection(
@@ -29,13 +32,15 @@ class Model:
         self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
         self.map_plotter = MapPlotter(self.measurements_map)
 
-    def measure_point_by_coordinates(self, x, y):
+    def measure_point_by_coordinates(self, x: int, y: int):
         id = self.measurements_map.find_point_id(x, y)
         self.measure_point_by_id(id)
 
-    def measure_point_by_id(self, id):
-        rssi, perc = self.measurements_mgr.measure_point()
-        self.measurements_map.update_map_with_rssi_values(id, rssi, perc)
+    def measure_point_by_id(self, id: int):
+        result = self.measurements_mgr.measure_point()
+        if result:
+            rssi, perc = result
+            self.measurements_map.update_map_with_rssi_values(id, rssi, perc)
 
-    def get_map_with_rssi_values(self):
+    def get_map_with_rssi_values(self) -> plt.Figure:
         return self.map_plotter.create_map_with_rssi_values()

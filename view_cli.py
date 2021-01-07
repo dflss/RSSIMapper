@@ -2,12 +2,13 @@ import argparse
 import sys
 import matplotlib.pyplot as plt
 
+from presenter import Presenter
 from program_data import ProgramData
 from view import View
 
 
 class ViewCLI(View):
-    def __init__(self, presenter):
+    def __init__(self, presenter: Presenter):
         super().__init__(presenter)
         self.menu_actions = {
             'main_menu': self.main_menu,
@@ -22,7 +23,7 @@ class ViewCLI(View):
     def show(self):
         self.main_menu()
 
-    def render_map(self, figure):
+    def render_map(self, figure: plt.Figure):
         plt.show()
 
     def main_menu(self):
@@ -36,7 +37,7 @@ class ViewCLI(View):
     def back(self):
         self.menu_actions['main_menu']()
 
-    def exec_menu(self, choice):
+    def exec_menu(self, choice: str):
         ch = choice.lower()
         if ch == '':
             self.menu_actions['main_menu']()

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List
 
 import shapefile as shp  # type: ignore
 
@@ -19,7 +19,7 @@ class MeasurementsMap:
         self.ids = self._get_shapefile_ids()
         self.records = self._get_shapefile_records()
 
-    def _get_shapefile_ids(self) -> List[Record]:
+    def _get_shapefile_ids(self) -> List[int]:
         ids = []
         for shaperec in self.shape_records:
             ids.append(shaperec.record['ID'])
@@ -33,13 +33,13 @@ class MeasurementsMap:
             records.append(Record(shaperec.record['ID'], x, y))
         return records
 
-    def find_point_id(self, x: int, y: int) -> Optional[int]:
+    def find_point_id(self, x: int, y: int) -> int:
         for record in self.records:
-            if x > min(record.x) and x < max(record.x) and y > min(record.y) and y < max(record.y):
+            if min(record.x) < x < max(record.x) and min(record.y) < y < max(record.y):
                 return record.id
         raise ValueError(f"No id found for given coordinates ({x},{y})")
 
-    def update_map_with_rssi_values(self, id: int, rssi: int, perc: int) -> shp.ShapeRecord:
+    def update_map_with_rssi_values(self, id: int, rssi: float, perc: float) -> shp.ShapeRecord:
         logger.debug(f"Update id {id} with RSSI {rssi} and {perc}%")
         for shaperec in self.shape_records:
             if shaperec.record['ID'] == id:

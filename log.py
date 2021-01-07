@@ -1,7 +1,7 @@
 import logging
 
 
-def setup_logger(name):
+def setup_logger(name: str) -> logging.Logger:
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
 
     handler = logging.StreamHandler()

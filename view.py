@@ -1,4 +1,7 @@
-class View():
+from abc import ABC
+
+
+class View(ABC):
     def __init__(self, presenter):
         self._presenter = presenter
 
