@@ -11,7 +11,7 @@ class ShapefileManager:
             self._create_raw_shapefile_from_csv(csv_path, input_shapefile_path)
         self._create_output_shapefile(input_shapefile_path)
 
-    def _create_raw_shapefile_from_csv(self, csv_path, input_shapefile_path):
+    def _create_raw_shapefile_from_csv(self, csv_path: str, input_shapefile_path: str):
         data = pd.read_csv(csv_path)
         with shp.Writer(input_shapefile_path, shapeType=shp.POLYGON) as w:
             w.field('ID', 'N')
@@ -25,7 +25,7 @@ class ShapefileManager:
                 ]])
                 w.record(polygon['id'])
 
-    def _create_output_shapefile(self, input_shapefile_path):
+    def _create_output_shapefile(self, input_shapefile_path: str):
         with shp.Reader(input_shapefile_path) as r:
             with shp.Writer(self.output_shapefile_path, shapeType=shp.POLYGON) as w:
                 w.field('ID', 'N')

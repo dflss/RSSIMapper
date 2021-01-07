@@ -7,17 +7,19 @@ class MapPlotter:
     def __init__(self, map: MeasurementsMap):
         self.map = map
 
-    def display(self):
-        plt.figure()
+    def create_raw_map(self) -> plt.Figure:
+        fig = plt.figure()
         for shape in self.map.shape_records:
             x = [i[0] for i in shape.shape.points[:]]
             y = [i[1] for i in shape.shape.points[:]]
             plt.plot(x, y)
-        plt.show()
+        return fig
 
-    def display_with_rssi_values(self):
-        def get_color(rssi):
-            if rssi < -90:
+    def create_map_with_rssi_values(self) -> plt.Figure:
+        def get_color(rssi: int) -> str:
+            if rssi == 0:
+                return 'white'
+            elif rssi < -90:
                 return 'blue'
             elif rssi < -70:
                 return 'green'
@@ -26,16 +28,18 @@ class MapPlotter:
             else:
                 return 'red'
 
-        plt.figure()
+        fig = plt.figure()
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
-            plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']))
-        plt.show()
+            plt.fill_between(x, y, color=get_color(shaperec.record['RSSI']), lw=0.5, edgecolor='black')
+        return fig
 
-    def display_with_percent_values(self):
-        def get_color(perc):
-            if perc < 40:
+    def create_map_with_percent_values(self) -> plt.Figure:
+        def get_color(perc: int) -> str:
+            if perc == 0:
+                return 'white'
+            elif perc < 40:
                 return 'blue'
             elif perc < 60:
                 return 'green'
@@ -44,9 +48,9 @@ class MapPlotter:
             else:
                 return 'red'
 
-        plt.figure()
+        fig = plt.figure()
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
-            plt.fill_between(x, y, color=get_color(shaperec.record['PERC']))
-        plt.show()
+            plt.fill_between(x, y, color=get_color(shaperec.record['PERC']), lw=0.5, edgecolor='black')
+        return fig
