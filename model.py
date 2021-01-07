@@ -20,7 +20,7 @@ class Model:
         self.measurements_mgr = \
             MeasurementsManager(
                 serial_conn=self.serial_conn,
-                points_number=self.program_data.n_points,
+                points_number=self.program_data.n_measurements_per_point,
                 timeout=self.program_data.measurement_timeout
             )
         self.shapefile_mgr = \

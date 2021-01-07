@@ -2,7 +2,7 @@ import threading
 import tkinter as tk
 
 from queue import Queue
-
+from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
@@ -35,10 +35,48 @@ class ViewGUI(View):
         self._presenter.set_program_data(program_data)
 
     def show(self):
+        self._root.title("RSSIMapper")
+        tabControl = ttk.Notebook(self._root)
+
+        self.tab1 = ttk.Frame(tabControl)
+        self.tab2 = ttk.Frame(tabControl)
+
+        tabControl.add(self.tab1, text='Settings')
+        tabControl.add(self.tab2, text='Map')
+        tabControl.pack(expand=1, fill="both")
+
         tk.Button(self._root, text="Quit", command=self._root.quit).pack()
-        tk.Button(self._root, text="Upload csv", command=self._upload_csv).pack()
-        tk.Button(self._root, text="Upload shapefile", command=self._upload_shapefile).pack()
-        self._progress_label = tk.Label(self._root)
+
+        fields = {
+            'input_csv': 'example-data.csv',
+            'input_shapefile': 'input_map',
+            'output_results': 'output_results',
+            'output_shapefile': 'map',
+            'port': '/dev/pts/3',
+            'baudrate': 115200,
+            'serial_timeout': 10,
+            'measurement_timeout': 100,
+            'n_measurements_per_point': 100
+        }
+        entries = {}
+        for field, default_val in fields.items():
+            row = tk.Frame(self.tab1)
+            lab = tk.Label(row, width=22, text=field, anchor='w')
+            ent = tk.Entry(row)
+            ent.insert(0, default_val)
+            row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+            lab.pack(side=tk.LEFT)
+            ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+            entries[field] = ent
+
+        print(entries)
+
+        # tk.Button(self.tab1, text="Upload csv", command=self._upload_csv).pack()
+        # tk.Button(self.tab1, text="Upload shapefile", command=self._upload_shapefile).pack()
+
+        tk.Button(self.tab1, text="Save", command=self._save_settings).pack()
+        # print(port_entry.get())
+        self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
         self._root.mainloop()
@@ -49,7 +87,7 @@ class ViewGUI(View):
         except AttributeError:
             pass
         self._clear_measurement_progress_label()
-        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self._root)
+        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.canvas.mpl_connect('button_press_event', self._on_map_click)
 
@@ -99,4 +137,7 @@ class ViewGUI(View):
         raise NotImplementedError
 
     def _upload_shapefile(self):
+        raise NotImplementedError
+
+    def _save_settings(self):
         raise NotImplementedError
