@@ -1,8 +1,9 @@
+import os
 import threading
 import tkinter as tk
 
 from queue import Queue
-
+from tkinter import ttk, filedialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
@@ -13,6 +14,17 @@ from view import View
 
 
 MAP_UPDATE = 1
+DEFAULT_FIELDS = {
+    'input_csv': 'example-data.csv',
+    'input_shapefile': 'input_map',
+    'output_results': 'output_results',
+    'output_shapefile': 'map',
+    'port': '/dev/pts/3',
+    'baudrate': 115200,
+    'serial_timeout': 10,
+    'measurement_timeout': 100,
+    'n_measurements_per_point': 100
+}
 
 
 class ViewGUI(View):
@@ -21,27 +33,56 @@ class ViewGUI(View):
         self._root = tk.Tk()
         self._queue: Queue = Queue()
         self._check_queue()
-        program_data = ProgramData(  # TODO input data from user
-            'example-data.csv',
-            'input_map',
-            'output_results',
-            'map',
-            '/dev/pts/3',
-            115200,
-            10,
-            100,
-            100
-        )
-        self._presenter.set_program_data(program_data)
+        self.fields = DEFAULT_FIELDS
+        self._update_program_data()
 
     def show(self):
+        self._root.title("RSSIMapper")
+        tabControl = ttk.Notebook(self._root)
+
+        self.tab1 = ttk.Frame(tabControl)
+        self.tab2 = ttk.Frame(tabControl)
+
+        tabControl.add(self.tab1, text='Settings')
+        tabControl.add(self.tab2, text='Map')
+        tabControl.pack(expand=1, fill="both")
+
         tk.Button(self._root, text="Quit", command=self._root.quit).pack()
-        tk.Button(self._root, text="Upload csv", command=self._upload_csv).pack()
-        tk.Button(self._root, text="Upload shapefile", command=self._upload_shapefile).pack()
-        self._progress_label = tk.Label(self._root)
+
+        def only_numbers(char):
+            return char.isdigit()
+
+        validation = self._root.register(only_numbers)
+
+        self.entries = {}
+        for field, default_val in self.fields.items():
+            row = tk.Frame(self.tab1)
+            lab = tk.Label(row, width=22, text=field, anchor='w')
+            ent = tk.Entry(row)
+            ent.insert(0, default_val)
+            row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+            lab.pack(side=tk.LEFT)
+            ent.pack(side=tk.LEFT, expand=tk.YES, fill=tk.X)
+            self.entries[field] = ent
+            if field == 'input_csv':
+                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_csv')).pack(side=tk.RIGHT)
+            elif field == 'input_shapefile':
+                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_shapefile')).pack(side=tk.RIGHT)
+            elif field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
+                ent.configure(validate="key", validatecommand=(validation, '%S'))
+
+        tk.Button(self.tab1, text="Save", command=self._save_settings).pack()
+        self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
         self._root.mainloop()
+
+    def browse_files(self, field):
+        filename = filedialog.askopenfilename(initialdir=os.getcwd(),
+                                              title="Select a file")
+        entry = self.entries[field]
+        entry.delete(0, tk.END)
+        entry.insert(0, filename)
 
     def render_map(self, figure: plt.Figure):
         try:
@@ -49,7 +90,7 @@ class ViewGUI(View):
         except AttributeError:
             pass
         self._clear_measurement_progress_label()
-        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self._root)
+        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.canvas.mpl_connect('button_press_event', self._on_map_click)
 
@@ -74,6 +115,10 @@ class ViewGUI(View):
         self._process_incoming_queue_messages()
         self._root.after(200, self._check_queue)
 
+    def _update_program_data(self):
+        program_data = ProgramData(*(list(self.fields.values())))  # type: ignore
+        self._presenter.set_program_data(program_data)
+
     def _on_map_click(self, event):
         if event.inaxes is not None:
             x = event.xdata
@@ -95,8 +140,13 @@ class ViewGUI(View):
     def _clear_measurement_progress_label(self):
         self._progress_label.config(text="")
 
-    def _upload_csv(self):
-        raise NotImplementedError
+    def _save_settings(self):
+        for field, val in self.entries.items():
+            if field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
+                self.fields[field] = int(val.get())
+            else:
+                self.fields[field] = val.get()
+        self._update_program_data()
 
-    def _upload_shapefile(self):
-        raise NotImplementedError
+    def _validate_entry(self, field, val):
+        pass

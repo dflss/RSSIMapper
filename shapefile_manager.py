@@ -7,7 +7,7 @@ import pandas as pd
 class ShapefileManager:
     def __init__(self, input_shapefile_path: str, output_shapefile_path: str, csv_path: Optional[str]):
         self.output_shapefile_path = output_shapefile_path
-        if csv_path is not None:
+        if csv_path:
             self._create_raw_shapefile_from_csv(csv_path, input_shapefile_path)
         self._create_output_shapefile(input_shapefile_path)
 

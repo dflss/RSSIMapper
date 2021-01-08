@@ -11,4 +11,4 @@ class ProgramData:
     baudrate: int
     serial_timeout: int
     measurement_timeout: int
-    n_points: int
+    n_measurements_per_point: int
