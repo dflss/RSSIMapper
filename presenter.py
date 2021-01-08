@@ -25,6 +25,10 @@ class Presenter:
     def set_program_data(self, program_data: ProgramData):
         self.check_if_model_initialized()
         self.model.set_program_data(program_data)
+        try:
+            self.update_map()
+        except Exception as e:
+            print(e)
 
     def measure_point_by_coordinates(self, x: int, y: int):
         self.check_if_model_initialized()

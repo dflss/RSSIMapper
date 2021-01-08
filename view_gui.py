@@ -13,6 +13,17 @@ from view import View
 
 
 MAP_UPDATE = 1
+DEFAULT_FIELDS = {
+    'input_csv': 'example-data.csv',
+    'input_shapefile': 'input_map',
+    'output_results': 'output_results',
+    'output_shapefile': 'map',
+    'port': '/dev/pts/3',
+    'baudrate': 115200,
+    'serial_timeout': 10,
+    'measurement_timeout': 100,
+    'n_measurements_per_point': 100
+}
 
 
 class ViewGUI(View):
@@ -21,18 +32,8 @@ class ViewGUI(View):
         self._root = tk.Tk()
         self._queue: Queue = Queue()
         self._check_queue()
-        program_data = ProgramData(  # TODO input data from user
-            'example-data.csv',
-            'input_map',
-            'output_results',
-            'map',
-            '/dev/pts/3',
-            115200,
-            10,
-            100,
-            100
-        )
-        self._presenter.set_program_data(program_data)
+        self.fields = DEFAULT_FIELDS
+        self._update_program_data()
 
     def show(self):
         self._root.title("RSSIMapper")
@@ -47,19 +48,8 @@ class ViewGUI(View):
 
         tk.Button(self._root, text="Quit", command=self._root.quit).pack()
 
-        fields = {
-            'input_csv': 'example-data.csv',
-            'input_shapefile': 'input_map',
-            'output_results': 'output_results',
-            'output_shapefile': 'map',
-            'port': '/dev/pts/3',
-            'baudrate': 115200,
-            'serial_timeout': 10,
-            'measurement_timeout': 100,
-            'n_measurements_per_point': 100
-        }
-        entries = {}
-        for field, default_val in fields.items():
+        self.entries = {}
+        for field, default_val in self.fields.items():
             row = tk.Frame(self.tab1)
             lab = tk.Label(row, width=22, text=field, anchor='w')
             ent = tk.Entry(row)
@@ -67,9 +57,7 @@ class ViewGUI(View):
             row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
             lab.pack(side=tk.LEFT)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-            entries[field] = ent
-
-        print(entries)
+            self.entries[field] = ent
 
         # tk.Button(self.tab1, text="Upload csv", command=self._upload_csv).pack()
         # tk.Button(self.tab1, text="Upload shapefile", command=self._upload_shapefile).pack()
@@ -112,6 +100,10 @@ class ViewGUI(View):
         self._process_incoming_queue_messages()
         self._root.after(200, self._check_queue)
 
+    def _update_program_data(self):
+        program_data = ProgramData(*(list(self.fields.values())))  # type: ignore
+        self._presenter.set_program_data(program_data)
+
     def _on_map_click(self, event):
         if event.inaxes is not None:
             x = event.xdata
@@ -140,4 +132,6 @@ class ViewGUI(View):
         raise NotImplementedError
 
     def _save_settings(self):
-        raise NotImplementedError
+        for field, val in self.entries.items():
+            self.fields[field] = val.get()
+        self._update_program_data()
