@@ -1,8 +1,9 @@
+import os
 import threading
 import tkinter as tk
 
 from queue import Queue
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
@@ -56,18 +57,25 @@ class ViewGUI(View):
             ent.insert(0, default_val)
             row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
             lab.pack(side=tk.LEFT)
-            ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+            ent.pack(side=tk.LEFT, expand=tk.YES, fill=tk.X)
             self.entries[field] = ent
-
-        # tk.Button(self.tab1, text="Upload csv", command=self._upload_csv).pack()
-        # tk.Button(self.tab1, text="Upload shapefile", command=self._upload_shapefile).pack()
+            if field == 'input_csv':
+                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_csv')).pack(side=tk.RIGHT)
+            elif field == 'input_shapefile':
+                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_shapefile')).pack(side=tk.RIGHT)
 
         tk.Button(self.tab1, text="Save", command=self._save_settings).pack()
-        # print(port_entry.get())
         self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
         self._root.mainloop()
+
+    def browse_files(self, field):
+        filename = filedialog.askopenfilename(initialdir=os.getcwd(),
+                                              title="Select a file")
+        entry = self.entries[field]
+        entry.delete(0, tk.END)
+        entry.insert(0, filename)
 
     def render_map(self, figure: plt.Figure):
         try:
@@ -124,12 +132,6 @@ class ViewGUI(View):
 
     def _clear_measurement_progress_label(self):
         self._progress_label.config(text="")
-
-    def _upload_csv(self):
-        raise NotImplementedError
-
-    def _upload_shapefile(self):
-        raise NotImplementedError
 
     def _save_settings(self):
         for field, val in self.entries.items():
