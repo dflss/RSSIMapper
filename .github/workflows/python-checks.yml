@@ -23,4 +23,5 @@ jobs:
         flake8
     - name: Test with mypy
       run: |
-        mypy *py
+        mypy src/*py
+        mypy src/**/*py
