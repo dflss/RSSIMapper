@@ -35,7 +35,7 @@ class MapPlotter:
             rssi = shaperec.record['RSSI']
             plt.fill_between(x, y, color=get_color(rssi), lw=0.5, edgecolor='black')
             if rssi:
-                plt.annotate(rssi, ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')
+                plt.annotate(rssi, ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')  # type: ignore
         return fig
 
     def create_map_with_percent_values(self) -> plt.Figure:
@@ -58,5 +58,5 @@ class MapPlotter:
             perc = shaperec.record['PERC']
             plt.fill_between(x, y, color=get_color(perc), lw=0.5, edgecolor='black')
             if perc:
-                plt.annotate(f'{perc}%', ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')
+                plt.annotate(f'{perc}%', ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')  # type: ignore
         return fig
