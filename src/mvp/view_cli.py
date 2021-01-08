@@ -2,9 +2,9 @@ import argparse
 import sys
 import matplotlib.pyplot as plt
 
-from presenter import Presenter
-from program_data import ProgramData
-from view import View
+from src.mvp.presenter import Presenter
+from src.logic.program_data import ProgramData
+from src.mvp.view import View
 
 
 class ViewCLI(View):

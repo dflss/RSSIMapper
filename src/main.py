@@ -1,9 +1,9 @@
 import sys
 
-from presenter import Presenter
-from model import Model
-from view_cli import ViewCLI
-from view_gui import ViewGUI
+from src.mvp.presenter import Presenter
+from src.mvp.model import Model
+from src.mvp.view_cli import ViewCLI
+from src.mvp.view_gui import ViewGUI
 
 
 def main():

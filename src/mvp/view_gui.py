@@ -7,18 +7,18 @@ from tkinter import ttk, filedialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
-from log import logger
-from presenter import Presenter
-from program_data import ProgramData
-from view import View
+from src.utils.log import logger
+from src.mvp.presenter import Presenter
+from src.logic.program_data import ProgramData
+from src.mvp.view import View
 
 
 MAP_UPDATE = 1
 DEFAULT_FIELDS = {
-    'input_csv': 'example-data.csv',
-    'input_shapefile': 'input_map',
-    'output_results': 'output_results',
-    'output_shapefile': 'map',
+    'input_csv': 'input_data/example-data.csv',
+    'input_shapefile': 'input_data/input_map',
+    'output_results': 'output_data/output_results',
+    'output_shapefile': 'output_data/map',
     'port': '/dev/pts/3',
     'baudrate': 115200,
     'serial_timeout': 10,
@@ -147,6 +147,3 @@ class ViewGUI(View):
             else:
                 self.fields[field] = val.get()
         self._update_program_data()
-
-    def _validate_entry(self, field, val):
-        pass

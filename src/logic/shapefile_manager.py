@@ -3,6 +3,8 @@ from typing import List, Optional
 import shapefile as shp  # type: ignore
 import pandas as pd
 
+from src.utils.log import logger
+
 
 class ShapefileManager:
     def __init__(self, input_shapefile_path: str, output_shapefile_path: str, csv_path: Optional[str]):
@@ -12,18 +14,21 @@ class ShapefileManager:
         self._create_output_shapefile(input_shapefile_path)
 
     def _create_raw_shapefile_from_csv(self, csv_path: str, input_shapefile_path: str):
-        data = pd.read_csv(csv_path)
-        with shp.Writer(input_shapefile_path, shapeType=shp.POLYGON) as w:
-            w.field('ID', 'N')
-            for i, polygon in data.iterrows():
-                w.poly([[
-                    [polygon['x1'], polygon['y1']],
-                    [polygon['x2'], polygon['y2']],
-                    [polygon['x3'], polygon['y3']],
-                    [polygon['x4'], polygon['y4']],
-                    [polygon['x1'], polygon['y1']],
-                ]])
-                w.record(polygon['id'])
+        try:
+            data = pd.read_csv(csv_path)
+            with shp.Writer(input_shapefile_path, shapeType=shp.POLYGON) as w:
+                w.field('ID', 'N')
+                for i, polygon in data.iterrows():
+                    w.poly([[
+                        [polygon['x1'], polygon['y1']],
+                        [polygon['x2'], polygon['y2']],
+                        [polygon['x3'], polygon['y3']],
+                        [polygon['x4'], polygon['y4']],
+                        [polygon['x1'], polygon['y1']],
+                    ]])
+                    w.record(polygon['id'])
+        except FileNotFoundError:
+            logger.error(f'File {csv_path} not found!')
 
     def _create_output_shapefile(self, input_shapefile_path: str):
         with shp.Reader(input_shapefile_path) as r:
