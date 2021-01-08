@@ -14,14 +14,14 @@ class Model:
         self.serial_conn = \
             SerialConnection(
                 port=self.program_data.port,
-                baudrate=int(self.program_data.baudrate),
-                timeout=int(self.program_data.serial_timeout)
+                baudrate=self.program_data.baudrate,
+                timeout=self.program_data.serial_timeout
             )
         self.measurements_mgr = \
             MeasurementsManager(
                 serial_conn=self.serial_conn,
-                points_number=int(self.program_data.n_measurements_per_point),
-                timeout=int(self.program_data.measurement_timeout)
+                points_number=self.program_data.n_measurements_per_point,
+                timeout=self.program_data.measurement_timeout
             )
         self.shapefile_mgr = \
             ShapefileManager(

@@ -70,10 +70,10 @@ class ViewCLI(View):
                 args.output_results,
                 args.output_shapefile,
                 args.port,
-                args.baudrate,
-                args.serial_timeout,
-                args.measurement_timeout,
-                args.n_points,
+                int(args.baudrate),
+                int(args.serial_timeout),
+                int(args.measurement_timeout),
+                int(args.n_points),
             )
 
     def measure_point(self):

@@ -8,7 +8,7 @@ class ProgramData:
     output_results: str
     output_shapefile: str
     port: str
-    baudrate: str
-    serial_timeout: str
-    measurement_timeout: str
-    n_measurements_per_point: str
+    baudrate: int
+    serial_timeout: int
+    measurement_timeout: int
+    n_measurements_per_point: int

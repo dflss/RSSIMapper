@@ -49,6 +49,11 @@ class ViewGUI(View):
 
         tk.Button(self._root, text="Quit", command=self._root.quit).pack()
 
+        def only_numbers(char):
+            return char.isdigit()
+
+        validation = self._root.register(only_numbers)
+
         self.entries = {}
         for field, default_val in self.fields.items():
             row = tk.Frame(self.tab1)
@@ -63,6 +68,8 @@ class ViewGUI(View):
                 tk.Button(row, text="Browse", command=lambda: self.browse_files('input_csv')).pack(side=tk.RIGHT)
             elif field == 'input_shapefile':
                 tk.Button(row, text="Browse", command=lambda: self.browse_files('input_shapefile')).pack(side=tk.RIGHT)
+            elif field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
+                ent.configure(validate="key", validatecommand=(validation, '%S'))
 
         tk.Button(self.tab1, text="Save", command=self._save_settings).pack()
         self._progress_label = tk.Label(self.tab2)
@@ -135,5 +142,11 @@ class ViewGUI(View):
 
     def _save_settings(self):
         for field, val in self.entries.items():
-            self.fields[field] = val.get()
+            if field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
+                self.fields[field] = int(val.get())
+            else:
+                self.fields[field] = val.get()
         self._update_program_data()
+
+    def _validate_entry(self, field, val):
+        pass

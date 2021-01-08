@@ -1,3 +1,4 @@
+from log import logger
 from model import Model
 from program_data import ProgramData
 from view import View
@@ -28,7 +29,7 @@ class Presenter:
         try:
             self.update_map()
         except Exception as e:
-            print(e)
+            logger.error(f'Exception occurred: {e}')
 
     def measure_point_by_coordinates(self, x: int, y: int):
         self.check_if_model_initialized()
