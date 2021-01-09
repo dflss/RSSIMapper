@@ -47,4 +47,5 @@ class Presenter:
         self.check_if_model_initialized()
         self.check_if_view_initialized()
         fig = self.model.get_map_with_rssi_values()
+        self.model.save_plot()
         self.view.render_map(fig)

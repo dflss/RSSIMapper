@@ -55,12 +55,13 @@ class ViewCLI(View):
         required = parser.add_argument_group('required arguments')
         required.add_argument("-is", "--input_shapefile", help="input shapefile", required=True)
         required.add_argument("-or", "--output_results", help="text file for saving results", required=True)
-        required.add_argument("-os", "--output_shapefile", help="file for saving colored map", required=True)
+        required.add_argument("-os", "--output_shapefile", help="file for saving output shapefile", required=True)
+        required.add_argument("-op", "--output_plot", help="file for saving colored map", required=True)
         required.add_argument("-p", "--port", help="port where board is connected", required=True)
         required.add_argument("-b", "--baudrate", help="baudrate for serial connection", required=True)
         required.add_argument("-st", "--serial_timeout", help="timeout for serial connection", required=True)
         required.add_argument("-mt", "--measurement_timeout", help="timeout for measurement point", required=True)
-        required.add_argument("-n", "--n_points", help="number of measurements taken for 1 point", required=True)
+        required.add_argument("-n", "--n_measurements", help="number of measurements taken for 1 point", required=True)
         parser._action_groups.append(optional)
         args = parser.parse_args()
         return \
@@ -69,11 +70,12 @@ class ViewCLI(View):
                 args.input_shapefile,
                 args.output_results,
                 args.output_shapefile,
+                args.output_plot,
                 args.port,
                 int(args.baudrate),
                 int(args.serial_timeout),
                 int(args.measurement_timeout),
-                int(args.n_points),
+                int(args.n_measurements),
             )
 
     def measure_point(self):
