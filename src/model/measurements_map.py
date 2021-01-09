@@ -3,7 +3,7 @@ from typing import List
 
 import shapefile as shp  # type: ignore
 
-from log import logger
+from src.log import logger
 
 
 @dataclass

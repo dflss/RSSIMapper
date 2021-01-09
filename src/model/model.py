@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 
-from map_plotter import MapPlotter
-from measurements_manager import MeasurementsManager
-from measurements_map import MeasurementsMap
-from program_data import ProgramData
-from serial_connection import SerialConnection
-from shapefile_manager import ShapefileManager
+from src.model.map_plotter import MapPlotter
+from src.model.measurements_manager import MeasurementsManager
+from src.model.measurements_map import MeasurementsMap
+from src.model.program_data import ProgramData
+from src.model.serial_connection import SerialConnection
+from src.model.shapefile_manager import ShapefileManager
 
 
 class Model:

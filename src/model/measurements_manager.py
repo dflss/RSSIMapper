@@ -2,8 +2,8 @@ import statistics
 import time
 from typing import Optional, Tuple, List
 
-from log import logger
-from serial_connection import SerialConnection
+from src.log import logger
+from src.model.serial_connection import SerialConnection
 
 
 class MeasurementsManager:
