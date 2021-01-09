@@ -19,6 +19,7 @@ DEFAULT_FIELDS = {
     'input_shapefile': 'input_data/input_map',
     'output_results': 'output_data/output_results',
     'output_shapefile': 'output_data/map',
+    'output_plot': 'output_data/plot',
     'port': '/dev/pts/2',
     'baudrate': 115200,
     'serial_timeout': 10,

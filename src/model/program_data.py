@@ -7,6 +7,7 @@ class ProgramData:
     input_shapefile: str
     output_results: str
     output_shapefile: str
+    output_plot: str
     port: str
     baudrate: int
     serial_timeout: int
