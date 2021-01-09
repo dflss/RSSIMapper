@@ -1,7 +1,7 @@
-from src.utils.log import logger
-from src.mvp.model import Model
-from src.logic.program_data import ProgramData
-from src.mvp.view import View
+from src.log import logger
+from src.model.model import Model
+from src.model.program_data import ProgramData
+from src.view.view import View
 
 
 class Presenter:

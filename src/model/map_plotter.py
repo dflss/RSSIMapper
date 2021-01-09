@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from src.logic.measurements_map import MeasurementsMap
+from src.model.measurements_map import MeasurementsMap
 
 
 class MapPlotter:

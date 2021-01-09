@@ -3,7 +3,7 @@ from typing import List, Optional
 import shapefile as shp  # type: ignore
 import pandas as pd
 
-from src.utils.log import logger
+from src.log import logger
 
 
 class ShapefileManager:

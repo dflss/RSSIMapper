@@ -7,10 +7,10 @@ from tkinter import ttk, filedialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
-from src.utils.log import logger
-from src.mvp.presenter import Presenter
-from src.logic.program_data import ProgramData
-from src.mvp.view import View
+from src.log import logger
+from src.presenter.presenter import Presenter
+from src.model.program_data import ProgramData
+from src.view.view import View
 
 
 MAP_UPDATE = 1
@@ -38,16 +38,16 @@ class ViewGUI(View):
 
     def show(self):
         self._root.title("RSSIMapper")
-        tabControl = ttk.Notebook(self._root)
+        tk.Button(self._root, text="Quit", command=self._root.quit).pack(anchor=tk.NE, padx=10, pady=10)
+
+        tabControl = ttk.Notebook(self._root, padding=5)
 
         self.tab1 = ttk.Frame(tabControl)
         self.tab2 = ttk.Frame(tabControl)
 
-        tabControl.add(self.tab1, text='Settings')
+        tabControl.add(self.tab1, text='Settings', padding=20)
         tabControl.add(self.tab2, text='Map')
         tabControl.pack(expand=1, fill="both")
-
-        tk.Button(self._root, text="Quit", command=self._root.quit).pack()
 
         def only_numbers(char):
             return char.isdigit()
@@ -65,13 +65,21 @@ class ViewGUI(View):
             ent.pack(side=tk.LEFT, expand=tk.YES, fill=tk.X)
             self.entries[field] = ent
             if field == 'input_csv':
-                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_csv')).pack(side=tk.RIGHT)
+                tk.Button(
+                    row,
+                    text="Browse",
+                    command=lambda: self.browse_files('input_csv')
+                ).pack(side=tk.RIGHT, padx=(10, 0))
             elif field == 'input_shapefile':
-                tk.Button(row, text="Browse", command=lambda: self.browse_files('input_shapefile')).pack(side=tk.RIGHT)
+                tk.Button(
+                    row,
+                    text="Browse",
+                    command=lambda: self.browse_files('input_shapefile')
+                ).pack(side=tk.RIGHT, padx=(10, 0))
             elif field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
                 ent.configure(validate="key", validatecommand=(validation, '%S'))
 
-        tk.Button(self.tab1, text="Save", command=self._save_settings).pack()
+        tk.Button(self.tab1, text="Save", command=self._save_settings).pack(pady=20)
         self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
