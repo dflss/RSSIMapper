@@ -1,7 +1,7 @@
 import statistics
 
 import matplotlib.pyplot as plt
-from matplotlib import ticker
+from matplotlib import ticker  # type: ignore
 
 from src.model.measurements_map import MeasurementsMap
 
@@ -33,10 +33,10 @@ class MapPlotter:
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect('equal', adjustable='box')  # type: ignore
         tick_spacing = 2
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
@@ -61,10 +61,10 @@ class MapPlotter:
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect('equal', adjustable='box')  # type: ignore
         tick_spacing = 2
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
