@@ -74,5 +74,5 @@ class MapPlotter:
             perc = shaperec.record['PERC']
             plt.fill_between(x, y, color=get_color(perc), lw=0.5, edgecolor='white')
             if perc:
-                plt.annotate(f'{perc}%', ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')  # type: ignore
+                plt.annotate(f'{perc}%', ((max(x) + min(x))/2, (max(y) + min(y))/2), ha='center')  # type: ignore
         return fig
