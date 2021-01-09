@@ -1,5 +1,3 @@
-import statistics
-
 import matplotlib.pyplot as plt
 from matplotlib import ticker  # type: ignore
 
@@ -43,7 +41,12 @@ class MapPlotter:
             rssi = shaperec.record['RSSI']
             plt.fill_between(x, y, color=get_color(rssi), lw=0.5, edgecolor='white')
             if rssi:
-                plt.annotate(rssi, ((max(x) + min(x))/2, (max(y) + min(y))/2), ha='center', va='center')  # type: ignore
+                plt.annotate(  # type: ignore
+                    rssi,
+                    ((max(x) + min(x))/2, (max(y) + min(y))/2),
+                    ha='center',
+                    va='center'
+                )
         return fig
 
     def create_map_with_percent_values(self) -> plt.Figure:
