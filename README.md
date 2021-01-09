@@ -3,6 +3,8 @@
 ## Table of contents
 * [General info](#general-info)
 * [Getting started](#getting-started)
+* [Command-line mode](#cli)
+* [Graphical interface mode](#gui)
 * [Testing](#testing)
 
 ## General info
@@ -25,7 +27,11 @@ Next, install requirements:
 pip install -r requirements.txt
 ```
 
-Run main.py with the required arguments:
+The program can be run in CLI or graphical interface mode. 
+
+## Command-line mode
+
+In order to use the program in the CLI mode, run main.py with the required arguments:
 
 ```
 usage: main.py [-h] [-ic INPUT_CSV] -is INPUT_SHAPEFILE -or OUTPUT_RESULTS -os OUTPUT_SHAPEFILE -p PORT -b BAUDRATE -st SERIAL_TIMEOUT -mt MEASUREMENT_TIMEOUT -n N_POINTS
@@ -58,6 +64,29 @@ Example usage:
 ```
 python main.py -ic example-data.csv -is input_map -or output -os map -p /dev/pts/2 -b 115200 -st 10 -mt 100 -n 100
 ```
+
+## Graphical interface mode
+
+In order to use the GUI, run the program without any arguments:
+
+```
+python main.py
+```
+In the "Settings" tab all the program arguments can be configured and updated using the "Save" button.
+
+![alt text](https://user-images.githubusercontent.com/20957781/104104610-1f1ae280-52a1-11eb-9bc7-00cf05bc2a77.png)
+
+The "Map" tab will display the current map.
+
+![alt text](https://user-images.githubusercontent.com/20957781/104104614-23df9680-52a1-11eb-90d4-d21a58842964.png)
+
+After clicking on one of the squares (which represent a polygon with a given ID in the input shapefile), the measurement starts. The device (or device emulator script for testing) can be now run to send frames.
+
+![alt text](https://user-images.githubusercontent.com/20957781/104104754-f2b39600-52a1-11eb-87a1-ad58e8fa4cc1.png)
+
+When the measurement is finished (as a result of receiving n frames which were supposed to be sent during one measurement as configured in the settings, or as a result of a timeout - this can happen if some frames happen to be lost), the respective measurement point will be colored accordingly to the value of RSSI or percent of frames received and the exact value recorded by the program will be displayed on top of it. 
+
+![alt text](https://user-images.githubusercontent.com/20957781/104104760-f810e080-52a1-11eb-920d-b135359e61ff.png)
 
 ## Testing
 
