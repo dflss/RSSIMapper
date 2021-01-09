@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 
 from src.model.measurements_map import MeasurementsMap
 
@@ -18,7 +19,7 @@ class MapPlotter:
     def create_map_with_rssi_values(self) -> plt.Figure:
         def get_color(rssi: int) -> str:
             if rssi == 0:
-                return 'white'
+                return 'lightgrey'
             elif rssi < -90:
                 return 'blue'
             elif rssi < -70:
@@ -29,11 +30,16 @@ class MapPlotter:
                 return 'red'
 
         fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_aspect('equal', adjustable='box')
+        tick_spacing = 2
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
             rssi = shaperec.record['RSSI']
-            plt.fill_between(x, y, color=get_color(rssi), lw=0.5, edgecolor='black')
+            plt.fill_between(x, y, color=get_color(rssi), lw=0.5, edgecolor='white')
             if rssi:
                 plt.annotate(rssi, ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')  # type: ignore
         return fig
@@ -41,7 +47,7 @@ class MapPlotter:
     def create_map_with_percent_values(self) -> plt.Figure:
         def get_color(perc: int) -> str:
             if perc == 0:
-                return 'white'
+                return 'lightgrey'
             elif perc < 40:
                 return 'blue'
             elif perc < 60:
@@ -52,11 +58,16 @@ class MapPlotter:
                 return 'red'
 
         fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_aspect('equal', adjustable='box')
+        tick_spacing = 2
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
             perc = shaperec.record['PERC']
-            plt.fill_between(x, y, color=get_color(perc), lw=0.5, edgecolor='black')
+            plt.fill_between(x, y, color=get_color(perc), lw=0.5, edgecolor='white')
             if perc:
                 plt.annotate(f'{perc}%', ((max(x) - min(x))/2, (max(y) - min(y))/2), ha='center')  # type: ignore
         return fig
