@@ -15,7 +15,7 @@ from src.view.view import View
 
 MAP_UPDATE = 1
 DEFAULT_FIELDS = {
-    'input_csv': 'input_data/eiti_basement.csv',
+    'input_csv': 'input_data/example-data.csv',
     'input_shapefile': 'input_data/input_map',
     'output_results': 'output_data/output_results',
     'output_shapefile': 'output_data/map',
