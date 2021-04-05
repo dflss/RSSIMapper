@@ -14,36 +14,36 @@ class Model:
 
     def set_program_data(self, program_data: ProgramData):
         if self.program_data is None or \
-            self.program_data.port != program_data.port or \
-            self.program_data.baudrate != program_data.baudrate or \
-            self.program_data.serial_timeout != program_data.serial_timeout:
-                self.serial_conn = \
-                    SerialConnection(
-                        port=program_data.port,
-                        baudrate=program_data.baudrate,
-                        timeout=program_data.serial_timeout
-                    )
+                self.program_data.port != program_data.port or \
+                self.program_data.baudrate != program_data.baudrate or \
+                self.program_data.serial_timeout != program_data.serial_timeout:
+            self.serial_conn = \
+                SerialConnection(
+                    port=program_data.port,
+                    baudrate=program_data.baudrate,
+                    timeout=program_data.serial_timeout
+                )
         if self.program_data is None or \
-            self.program_data.n_measurements_per_point != program_data.n_measurements_per_point or \
-            self.program_data.measurement_timeout != program_data.measurement_timeout:
-                self.measurements_mgr = \
-                    MeasurementsManager(
-                        serial_conn=self.serial_conn,
-                        points_number=program_data.n_measurements_per_point,
-                        timeout=program_data.measurement_timeout
-                    )
+                self.program_data.n_measurements_per_point != program_data.n_measurements_per_point or \
+                self.program_data.measurement_timeout != program_data.measurement_timeout:
+            self.measurements_mgr = \
+                MeasurementsManager(
+                    serial_conn=self.serial_conn,
+                    points_number=program_data.n_measurements_per_point,
+                    timeout=program_data.measurement_timeout
+                )
         if self.program_data is None or \
-            self.program_data.input_shapefile != program_data.input_shapefile or \
-            self.program_data.output_shapefile != program_data.output_shapefile or \
-            self.program_data.input_csv != program_data.input_csv:
-                self.shapefile_mgr = \
-                    ShapefileManager(
-                        program_data.input_shapefile,
-                        program_data.output_shapefile,
-                        program_data.input_csv
-                    )
-                self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
-                self.map_plotter = MapPlotter(self.measurements_map)
+                self.program_data.input_shapefile != program_data.input_shapefile or \
+                self.program_data.output_shapefile != program_data.output_shapefile or \
+                self.program_data.input_csv != program_data.input_csv:
+            self.shapefile_mgr = \
+                ShapefileManager(
+                    program_data.input_shapefile,
+                    program_data.output_shapefile,
+                    program_data.input_csv
+                )
+            self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
+            self.map_plotter = MapPlotter(self.measurements_map)
         self.program_data = program_data
 
     def get_program_data(self):
