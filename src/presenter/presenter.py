@@ -25,7 +25,15 @@ class Presenter:
 
     def set_program_data(self, program_data: ProgramData):
         self.check_if_model_initialized()
+        # def input_output_map_modified(old, new):
+        #     return old.input_csv != new.input_csv or \
+        #            old.input_shapefile != new.input_shapefile or  \
+        #            old.output_results != new.output_results or \
+        #            old.output_shapefile != new.output_shapefile or \
+        #            old.output_plot != new.output_plot
+        # old_program_data = self.model.get_program_data()
         self.model.set_program_data(program_data)
+        # if old_program_data and input_output_map_modified(old_program_data, program_data):
         try:
             self.update_map()
         except Exception as e:
