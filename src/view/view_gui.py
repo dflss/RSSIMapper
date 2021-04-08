@@ -1,6 +1,7 @@
 import os
 import threading
 import tkinter as tk
+from dataclasses import asdict
 
 from queue import Queue
 from tkinter import ttk, filedialog
@@ -8,24 +9,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
 from src.log import logger
-from src.presenter.presenter import Presenter
 from src.model.program_data import ProgramData
+from src.presenter.presenter import Presenter
 from src.view.view import View
 
 
 MAP_UPDATE = 1
-DEFAULT_FIELDS = {
-    'input_csv': 'input_data/example-data.csv',
-    'input_shapefile': 'input_data/input_map',
-    'output_results': 'output_data/output_results',
-    'output_shapefile': 'output_data/map',
-    'output_plot': 'output_data/plot',
-    'port': '/dev/pts/2',
-    'baudrate': 115200,
-    'serial_timeout': 10,
-    'measurement_timeout': 100,
-    'n_measurements_per_point': 100
-}
 
 
 class ViewGUI(View):
@@ -34,8 +23,8 @@ class ViewGUI(View):
         self._root = tk.Tk()
         self._queue: Queue = Queue()
         self._check_queue()
-        self.fields = DEFAULT_FIELDS
-        self._update_program_data()
+        self.settings = self._fetch_saved_settings()
+        self.fields = asdict(self.settings)
 
     def show(self):
         self._root.title("RSSIMapper")
@@ -80,7 +69,7 @@ class ViewGUI(View):
             elif field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
                 ent.configure(validate="key", validatecommand=(validation, '%S'))
 
-        tk.Button(self.tab1, text="Save", command=self._save_settings).pack(pady=20)
+        tk.Button(self.tab1, text="Save", command=self._update_program_data).pack(pady=20)
         self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
@@ -125,8 +114,9 @@ class ViewGUI(View):
         self._root.after(200, self._check_queue)
 
     def _update_program_data(self):
-        program_data = ProgramData(*(list(self.fields.values())))  # type: ignore
-        self._presenter.set_program_data(program_data)
+        new_program_data = {k: v.get() for k, v in self.entries.items()}
+        self.settings = ProgramData(**new_program_data)
+        self._presenter.set_program_data(self.settings)
 
     def _on_map_click(self, event):
         if event.inaxes is not None:
@@ -150,9 +140,7 @@ class ViewGUI(View):
         self._progress_label.config(text="")
 
     def _save_settings(self):
-        for field, val in self.entries.items():
-            if field in ['baudrate', 'serial_timeout', 'measurement_timeout', 'n_measurements_per_point']:
-                self.fields[field] = int(val.get())
-            else:
-                self.fields[field] = val.get()
         self._update_program_data()
+
+    def _fetch_saved_settings(self):
+        return self._presenter.fetch_saved_settings()

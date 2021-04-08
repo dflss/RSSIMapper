@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+from src.model.config_manager import ConfigManager
 from src.model.map_plotter import MapPlotter
 from src.model.measurements_manager import MeasurementsManager
 from src.model.measurements_map import MeasurementsMap
@@ -8,29 +9,33 @@ from src.model.serial_connection import SerialConnection
 from src.model.shapefile_manager import ShapefileManager
 
 
+CONFIG_FILE_PATH = 'config.ini'
+
+
 class Model:
     def __init__(self):
         self.program_data = None
+        self.config_mgr = ConfigManager(CONFIG_FILE_PATH)
 
     def set_program_data(self, program_data: ProgramData):
         if self.program_data is None or \
                 self.program_data.port != program_data.port or \
-                self.program_data.baudrate != program_data.baudrate or \
-                self.program_data.serial_timeout != program_data.serial_timeout:
+                self.program_data.baudrate != int(program_data.baudrate) or \
+                self.program_data.serial_timeout != int(program_data.serial_timeout):
             self.serial_conn = \
                 SerialConnection(
                     port=program_data.port,
-                    baudrate=program_data.baudrate,
-                    timeout=program_data.serial_timeout
+                    baudrate=int(program_data.baudrate),
+                    timeout=int(program_data.serial_timeout)
                 )
         if self.program_data is None or \
-                self.program_data.n_measurements_per_point != program_data.n_measurements_per_point or \
-                self.program_data.measurement_timeout != program_data.measurement_timeout:
+                self.program_data.n_measurements_per_point != int(program_data.n_measurements_per_point) or \
+                self.program_data.measurement_timeout != int(program_data.measurement_timeout):
             self.measurements_mgr = \
                 MeasurementsManager(
                     serial_conn=self.serial_conn,
-                    points_number=program_data.n_measurements_per_point,
-                    timeout=program_data.measurement_timeout
+                    points_number=int(program_data.n_measurements_per_point),
+                    timeout=int(program_data.measurement_timeout)
                 )
         if self.program_data is None or \
                 self.program_data.input_shapefile != program_data.input_shapefile or \
