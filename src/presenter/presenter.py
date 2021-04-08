@@ -49,3 +49,6 @@ class Presenter:
         fig = self.model.get_map_with_rssi_values()
         self.model.save_plot()
         self.view.render_map(fig)
+
+    def get_received_status(self):
+        return self.model.get_received_status()

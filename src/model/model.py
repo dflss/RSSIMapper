@@ -49,6 +49,9 @@ class Model:
     def get_program_data(self):
         return self.program_data
 
+    def get_received_status(self):
+        return self.measurements_mgr.received
+
     def measure_point_by_coordinates(self, x: int, y: int):
         id = self.measurements_map.find_point_id(x, y)
         self.measure_point_by_id(id)
