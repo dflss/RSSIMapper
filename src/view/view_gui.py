@@ -145,7 +145,7 @@ class ViewGUI(View):
 
     def _save_settings(self):
         self._update_program_data()
-                                    
+
     def _fetch_saved_settings(self):
         return self._presenter.fetch_saved_settings()
 
