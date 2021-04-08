@@ -26,10 +26,16 @@ class Presenter:
     def set_program_data(self, program_data: ProgramData):
         self.check_if_model_initialized()
         self.model.set_program_data(program_data)
+        self.model.config_mgr.update(program_data)
         try:
             self.update_map()
         except Exception as e:
             logger.error(f'Exception occurred: {e}')
+
+    def fetch_saved_settings(self):
+        program_data = self.model.config_mgr.read()
+        self.model.set_program_data(program_data)
+        return program_data
 
     def measure_point_by_coordinates(self, x: int, y: int):
         self.check_if_model_initialized()
