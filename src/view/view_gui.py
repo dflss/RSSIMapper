@@ -25,6 +25,7 @@ class ViewGUI(View):
         self._check_queue()
         self.settings = self._fetch_saved_settings()
         self.fields = asdict(self.settings)
+        self.received_status = 0
 
     def show(self):
         self._root.title("RSSIMapper")
@@ -73,6 +74,7 @@ class ViewGUI(View):
         self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
         self._presenter.update_map()
+        self._refresh_received_status()
         self._root.mainloop()
 
     def browse_files(self, field):
@@ -134,7 +136,9 @@ class ViewGUI(View):
             logger.debug('Clicked outside axes bounds but inside plot window')
 
     def _update_measurement_progress_label(self):
-        self._progress_label.config(text="Measurement in progress...")
+        self._progress_label.config(text=f"Measurement in progress... "
+                                         f"Received: "
+                                         f"{self.received_status}/{self.entries['n_measurements_per_point'].get()}")
 
     def _clear_measurement_progress_label(self):
         self._progress_label.config(text="")
@@ -144,3 +148,10 @@ class ViewGUI(View):
 
     def _fetch_saved_settings(self):
         return self._presenter.fetch_saved_settings()
+
+    def _refresh_received_status(self):
+        received = self._presenter.get_received_status()
+        if self.received_status != received:
+            self.received_status = received
+        self._update_measurement_progress_label()
+        self._root.after(200, self._refresh_received_status)

@@ -11,11 +11,13 @@ class MeasurementsManager:
         self.serial_conn = serial_conn
         self.points_number = points_number
         self.timeout = timeout
+        self.received = 0
 
     def measure_point(self) -> Optional[Tuple[float, float]]:
+        self.received = 0
         rssi_values: List[int] = []
         start = time.time()
-        while time.time() - start < self.timeout and len(rssi_values) < self.points_number:
+        while time.time() - start < self.timeout and self.received < self.points_number:
             bytes_to_read = self.serial_conn.ser.inWaiting()
             text_read = self.serial_conn.ser.read(bytes_to_read).decode(encoding='utf-8')
             if text_read:
@@ -26,6 +28,7 @@ class MeasurementsManager:
                         logger.debug(f"Read RSSI value from serial: {rssi}")
                         try:
                             rssi_values.append(int(rssi))
+                            self.received += 1
                         except Exception as ex:
                             print(ex)
             time.sleep(0.1)
