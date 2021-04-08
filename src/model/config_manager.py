@@ -37,7 +37,5 @@ class ConfigManager:
         parser.set('Settings', 'serial_timeout', str(program_data.serial_timeout))
         parser.set('Settings', 'measurement_timeout', str(program_data.measurement_timeout))
         parser.set('Settings', 'n_measurements_per_point', str(program_data.n_measurements_per_point))
-        print("update config")
-        print(parser._sections['Settings'])
         with open(self.config_file_path, 'w') as fp:
             parser.write(fp)
