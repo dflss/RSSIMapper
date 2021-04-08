@@ -167,4 +167,3 @@ class ViewGUI(View):
             self.received_status = received
         self._update_measurement_progress_label()
         self._root.after(200, self._refresh_received_status)
-
