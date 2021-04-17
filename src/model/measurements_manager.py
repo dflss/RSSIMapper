@@ -19,7 +19,9 @@ class MeasurementsManager:
         start = time.time()
         while time.time() - start < self.timeout and self.received < self.points_number:
             bytes_to_read = self.serial_conn.ser.inWaiting()
-            text_read = self.serial_conn.ser.read(bytes_to_read).decode(encoding='utf-8')
+            text_read = self.serial_conn.ser.read(bytes_to_read).decode(
+                encoding="utf-8"
+            )
             if text_read:
                 args = text_read.split(" ")
                 for arg in args:
@@ -33,6 +35,9 @@ class MeasurementsManager:
                             print(ex)
             time.sleep(0.1)
         try:
-            return statistics.mean(rssi_values), (len(rssi_values)/self.points_number)*100
+            return (
+                statistics.mean(rssi_values),
+                (len(rssi_values) / self.points_number) * 100,
+            )
         except statistics.StatisticsError:
             return None

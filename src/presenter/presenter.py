@@ -30,7 +30,7 @@ class Presenter:
         try:
             self.update_map()
         except Exception as e:
-            logger.error(f'Exception occurred: {e}')
+            logger.error(f"Exception occurred: {e}")
 
     def fetch_saved_settings(self):
         program_data = self.model.config_mgr.read()

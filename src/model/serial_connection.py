@@ -6,7 +6,6 @@ import serial  # type: ignore
 
 
 class SerialConnection:
-
     def __init__(self, port: str, baudrate: int, timeout: int):
         self.ser = serial.Serial()
         self.ser.port = port
@@ -31,5 +30,5 @@ class SerialConnection:
             logging.warning("Serial is closed. Is the device connected?")
             raise serial.SerialException
         bytes_to_read = self.ser.inWaiting()
-        text_read = self.ser.read(bytes_to_read).decode(encoding='utf-8')
+        text_read = self.ser.read(bytes_to_read).decode(encoding="utf-8")
         return text_read

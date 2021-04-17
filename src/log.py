@@ -2,7 +2,9 @@ import logging
 
 
 def setup_logger(name: str) -> logging.Logger:
-    formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+    formatter = logging.Formatter(
+        fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s"
+    )
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
@@ -13,4 +15,4 @@ def setup_logger(name: str) -> logging.Logger:
     return logger
 
 
-logger = setup_logger('root')
+logger = setup_logger("root")
