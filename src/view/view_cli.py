@@ -71,7 +71,10 @@ class ViewCLI(View):
             required=True,
         )
         required.add_argument(
-            "-op", "--output_plot", help="file for saving colored map", required=True
+            "-opr", "--output_plot_rssi", help="file for saving colored map with RSSI values", required=True
+        )
+        required.add_argument(
+            "-opp", "--output_plot_perc", help="file for saving colored map with percent values", required=True
         )
         required.add_argument(
             "-p", "--port", help="port where board is connected", required=True

@@ -78,5 +78,5 @@ class Model:
     def get_map_with_percent_values(self) -> plt.Figure:
         return self.map_plotter.create_map_with_percent_values()
 
-    def save_plot(self):
-        plt.savefig(self.program_data.output_plot)
+    def save_plot(self, path):
+        plt.savefig(path)
