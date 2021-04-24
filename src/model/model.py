@@ -9,7 +9,7 @@ from src.model.serial_connection import SerialConnection
 from src.model.shapefile_manager import ShapefileManager
 
 
-CONFIG_FILE_PATH = 'config.ini'
+CONFIG_FILE_PATH = "config.ini"
 
 
 class Model:
@@ -18,35 +18,40 @@ class Model:
         self.config_mgr = ConfigManager(CONFIG_FILE_PATH)
 
     def set_program_data(self, program_data: ProgramData):
-        if self.program_data is None or \
-                self.program_data.port != program_data.port or \
-                self.program_data.baudrate != int(program_data.baudrate) or \
-                self.program_data.serial_timeout != int(program_data.serial_timeout):
-            self.serial_conn = \
-                SerialConnection(
-                    port=program_data.port,
-                    baudrate=int(program_data.baudrate),
-                    timeout=int(program_data.serial_timeout)
-                )
-        if self.program_data is None or \
-                self.program_data.n_measurements_per_point != int(program_data.n_measurements_per_point) or \
-                self.program_data.measurement_timeout != int(program_data.measurement_timeout):
-            self.measurements_mgr = \
-                MeasurementsManager(
-                    serial_conn=self.serial_conn,
-                    points_number=int(program_data.n_measurements_per_point),
-                    timeout=int(program_data.measurement_timeout)
-                )
-        if self.program_data is None or \
-                self.program_data.input_shapefile != program_data.input_shapefile or \
-                self.program_data.output_shapefile != program_data.output_shapefile or \
-                self.program_data.input_csv != program_data.input_csv:
-            self.shapefile_mgr = \
-                ShapefileManager(
-                    program_data.input_shapefile,
-                    program_data.output_shapefile,
-                    program_data.input_csv
-                )
+        if (
+            self.program_data is None
+            or self.program_data.port != program_data.port
+            or self.program_data.baudrate != int(program_data.baudrate)
+            or self.program_data.serial_timeout != int(program_data.serial_timeout)
+        ):
+            self.serial_conn = SerialConnection(
+                port=program_data.port,
+                baudrate=int(program_data.baudrate),
+                timeout=int(program_data.serial_timeout),
+            )
+        if (
+            self.program_data is None
+            or self.program_data.n_measurements_per_point
+            != int(program_data.n_measurements_per_point)
+            or self.program_data.measurement_timeout
+            != int(program_data.measurement_timeout)
+        ):
+            self.measurements_mgr = MeasurementsManager(
+                serial_conn=self.serial_conn,
+                points_number=int(program_data.n_measurements_per_point),
+                timeout=int(program_data.measurement_timeout),
+            )
+        if (
+            self.program_data is None
+            or self.program_data.input_shapefile != program_data.input_shapefile
+            or self.program_data.output_shapefile != program_data.output_shapefile
+            or self.program_data.input_csv != program_data.input_csv
+        ):
+            self.shapefile_mgr = ShapefileManager(
+                program_data.input_shapefile,
+                program_data.output_shapefile,
+                program_data.input_csv,
+            )
             self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
             self.map_plotter = MapPlotter(self.measurements_map)
         self.program_data = program_data
