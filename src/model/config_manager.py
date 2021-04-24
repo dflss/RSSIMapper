@@ -10,7 +10,8 @@ DEFAULT_PROGRAM_DATA = ProgramData(
     "input_data/input_map",
     "output_data/output_results",
     "output_data/map",
-    "output_data/plot",
+    "output_data/plot_rssi",
+    "output_data/plot_perc",
     "/dev/pts/2",
     115200,
     10,
@@ -43,7 +44,8 @@ class ConfigManager:
         parser.set("Settings", "input_shapefile", program_data.input_shapefile)
         parser.set("Settings", "output_results", program_data.output_results)
         parser.set("Settings", "output_shapefile", program_data.output_shapefile)
-        parser.set("Settings", "output_plot", program_data.output_plot)
+        parser.set("Settings", "output_plot_rssi", program_data.output_plot_rssi)
+        parser.set("Settings", "output_plot_perc", program_data.output_plot_perc)
         parser.set("Settings", "port", program_data.port)
         parser.set("Settings", "baudrate", str(program_data.baudrate))
         parser.set("Settings", "serial_timeout", str(program_data.serial_timeout))

@@ -1,3 +1,4 @@
+from src.constants import RSSI_CHOICE, PERCENT_CHOICE
 from src.log import logger
 from src.model.model import Model
 from src.model.program_data import ProgramData
@@ -49,11 +50,17 @@ class Presenter:
         self.model.measure_point_by_id(id)
         self.view.notify_map_updated()
 
-    def update_map(self):
+    def update_map(self, choice=RSSI_CHOICE):
         self.check_if_model_initialized()
         self.check_if_view_initialized()
-        fig = self.model.get_map_with_rssi_values()
-        self.model.save_plot()
+        if choice == RSSI_CHOICE:
+            fig = self.model.get_map_with_rssi_values()
+            self.model.save_plot(self.model.program_data.output_plot_rssi)
+        elif choice == PERCENT_CHOICE:
+            fig = self.model.get_map_with_percent_values()
+            self.model.save_plot(self.model.program_data.output_plot_perc)
+        else:
+            raise ValueError("Incorrect choice value")
         self.view.render_map(fig)
 
     def get_received_status(self):

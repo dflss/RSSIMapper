@@ -5,9 +5,12 @@ from dataclasses import asdict
 
 from queue import Queue
 from tkinter import ttk, filedialog
+from tkinter.ttk import Radiobutton
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
 
+from src.constants import RSSI_CHOICE, PERCENT_CHOICE
 from src.log import logger
 from src.model.program_data import ProgramData
 from src.presenter.presenter import Presenter
@@ -80,7 +83,27 @@ class ViewGUI(View):
         )
         self._progress_label = tk.Label(self.tab2)
         self._progress_label.pack()
-        self._presenter.update_map()
+
+        def show_selected_map():
+            self._presenter.update_map(self.chosen_value.get())
+
+        self.chosen_value = tk.IntVar()
+        self.chosen_value.set(RSSI_CHOICE)
+        Radiobutton(
+            self.tab2,
+            text="RSSI",
+            variable=self.chosen_value,
+            value=RSSI_CHOICE,
+            command=show_selected_map,
+        ).pack()
+        Radiobutton(
+            self.tab2,
+            text="Percent delivered",
+            variable=self.chosen_value,
+            value=PERCENT_CHOICE,
+            command=show_selected_map,
+        ).pack()
+        self._presenter.update_map(self.chosen_value.get())
         self._refresh_received_status()
         self._root.mainloop()
 
@@ -112,7 +135,7 @@ class ViewGUI(View):
                 msg = self._queue.get()
                 if msg == MAP_UPDATE:
                     self._clear_measurement_progress_label()
-                    self._presenter.update_map()
+                    self._presenter.update_map(self.chosen_value)
             except self._queue.empty():
                 pass
 
