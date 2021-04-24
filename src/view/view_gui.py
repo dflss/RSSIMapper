@@ -82,7 +82,9 @@ class ViewGUI(View):
             pady=20
         )
         self._progress_label = tk.Label(self.tab2)
-        self._progress_label.pack()
+        self._progress_label.pack(
+            pady=10
+        )
 
         def show_selected_map():
             self._presenter.update_map(self.chosen_value.get())
@@ -103,6 +105,9 @@ class ViewGUI(View):
             value=PERCENT_CHOICE,
             command=show_selected_map,
         ).pack()
+        tk.Button(self.tab2, text="Clear map", command=self._clear_map).pack(
+            pady=10
+        )
         self._presenter.update_map(self.chosen_value.get())
         self._refresh_received_status()
         self._root.mainloop()
@@ -135,7 +140,7 @@ class ViewGUI(View):
                 msg = self._queue.get()
                 if msg == MAP_UPDATE:
                     self._clear_measurement_progress_label()
-                    self._presenter.update_map(self.chosen_value)
+                    self._presenter.update_map()
             except self._queue.empty():
                 pass
 
@@ -176,6 +181,10 @@ class ViewGUI(View):
 
     def _clear_measurement_progress_label(self):
         self._progress_label.config(text="")
+
+    def _clear_map(self):
+        self._presenter.clear_map()
+        self._presenter.update_map()
 
     def _save_settings(self):
         self._update_program_data()

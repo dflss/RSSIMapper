@@ -63,5 +63,8 @@ class Presenter:
             raise ValueError("Incorrect choice value")
         self.view.render_map(fig)
 
+    def clear_map(self):
+        self.model.clear_measurements()
+
     def get_received_status(self):
         return self.model.get_received_status()
