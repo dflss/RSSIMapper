@@ -4,7 +4,7 @@ import tkinter as tk
 from dataclasses import asdict
 
 from queue import Queue
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog
 from tkinter.ttk import Radiobutton
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
@@ -89,8 +89,20 @@ class ViewGUI(View):
 
         self.chosen_value = tk.IntVar()
         self.chosen_value.set(RSSI_CHOICE)
-        Radiobutton(self.tab2, text="RSSI", variable=self.chosen_value, value=RSSI_CHOICE, command=show_selected_map).pack()
-        Radiobutton(self.tab2, text="Percent delivered", variable=self.chosen_value, value=PERCENT_CHOICE, command=show_selected_map).pack()
+        Radiobutton(
+            self.tab2,
+            text="RSSI",
+            variable=self.chosen_value,
+            value=RSSI_CHOICE,
+            command=show_selected_map,
+        ).pack()
+        Radiobutton(
+            self.tab2,
+            text="Percent delivered",
+            variable=self.chosen_value,
+            value=PERCENT_CHOICE,
+            command=show_selected_map,
+        ).pack()
         self._presenter.update_map(self.chosen_value.get())
         self._refresh_received_status()
         self._root.mainloop()
