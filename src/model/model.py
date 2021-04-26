@@ -78,3 +78,7 @@ class Model:
 
     def save_plot(self, path):
         plt.savefig(path)
+
+    def clear_measurements(self):
+        self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
+        self.map_plotter = MapPlotter(self.measurements_map)
