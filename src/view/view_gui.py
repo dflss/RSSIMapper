@@ -5,7 +5,7 @@ from dataclasses import asdict
 
 from queue import Queue
 from tkinter import ttk, filedialog
-from tkinter.ttk import Radiobutton, Scrollbar
+from tkinter.ttk import Radiobutton
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
