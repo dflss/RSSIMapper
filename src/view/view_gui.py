@@ -6,9 +6,11 @@ from dataclasses import asdict
 from queue import Queue
 from tkinter import ttk, filedialog
 from tkinter.ttk import Radiobutton
+import tkinter.constants as Tkconstants
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 from src.constants import RSSI_CHOICE, PERCENT_CHOICE
 from src.log import logger
@@ -120,15 +122,79 @@ class ViewGUI(View):
         entry.delete(0, tk.END)
         entry.insert(0, filename)
 
+    def printBboxes(self, label=""):
+        print("  " + label,
+              "canvas.bbox:", self.canvas.bbox(Tkconstants.ALL),
+              "mplCanvas.bbox:", self.mplCanvas.bbox(Tkconstants.ALL))
+
+    def addScrollingFigure(self, figure, frame):
+        # set up a canvas with scrollbars
+        self.canvas = tk.Canvas(frame)
+        self.canvas.grid(row=1, column=1, sticky=Tkconstants.NSEW)
+
+        xScrollbar = tk.Scrollbar(frame, orient=Tkconstants.HORIZONTAL)
+        yScrollbar = tk.Scrollbar(frame)
+
+        xScrollbar.grid(row=2, column=1, sticky=Tkconstants.EW)
+        yScrollbar.grid(row=1, column=2, sticky=Tkconstants.NS)
+
+        self.canvas.config(xscrollcommand=xScrollbar.set)
+        xScrollbar.config(command=self.canvas.xview)
+        self.canvas.config(yscrollcommand=yScrollbar.set)
+        yScrollbar.config(command=self.canvas.yview)
+
+        # plug in the figure
+        self.figAgg = FigureCanvasTkAgg(figure, self.canvas)
+        self.mplCanvas = self.figAgg.get_tk_widget()
+        self.figAgg.mpl_connect("button_press_event", self._on_map_click)
+
+        # and connect figure with scrolling region
+        self.cwid = self.canvas.create_window(0, 0, window=self.mplCanvas, anchor=Tkconstants.NW)
+        self.printBboxes("Init")
+        self.canvas.config(scrollregion=self.canvas.bbox(Tkconstants.ALL), width=200, height=200)
+        buttonFrame = tk.Frame(self.tab2)
+        buttonFrame.pack()
+        biggerButton = tk.Button(buttonFrame, text="larger",
+                                 command=lambda: self.changeSize(figure, 1.5))
+        biggerButton.grid(column=1, row=1)
+        smallerButton = tk.Button(buttonFrame, text="smaller",
+                                  command=lambda: self.changeSize(figure, .5))
+        smallerButton.grid(column=1, row=2)
+
+    def changeSize(self, figure: Figure, factor):
+        oldSize = figure.get_size_inches()
+        print("old size is", oldSize)
+        figure.set_size_inches([factor * s for s in oldSize])
+        wi, hi = [i * figure.dpi for i in figure.get_size_inches()]
+        print("new size is", figure.get_size_inches())
+        print("new size pixels: ", wi, hi)
+        self.mplCanvas.config(width=wi, height=hi)
+        self.printBboxes("A")
+        self.canvas.itemconfigure(self.cwid, width=wi, height=hi)
+        self.printBboxes("B")
+        self.canvas.config(scrollregion=self.canvas.bbox(Tkconstants.ALL), width=200, height=200)
+        figure.canvas.draw();
+        self.printBboxes("C")
+        print()
+
     def render_map(self, figure: plt.Figure):
         try:
-            self.canvas.get_tk_widget().pack_forget()
+            self.figAgg.get_tk_widget().pack_forget()
+            print("remove")
+            self.figAgg = FigureCanvasTkAgg(figure, self.canvas)
+            self.mplCanvas = self.figAgg.get_tk_widget()
+            self.figAgg.mpl_connect("button_press_event", self._on_map_click)
         except AttributeError:
-            pass
+            frame = tk.Frame(self.tab2)
+            frame.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+            frame.rowconfigure(1, weight=1)
+            frame.columnconfigure(1, weight=1)
+            self.addScrollingFigure(figure, frame)
         self._clear_measurement_progress_label()
-        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.canvas.mpl_connect("button_press_event", self._on_map_click)
+
+        # self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
+        # self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        # self.canvas.mpl_connect("button_press_event", self._on_map_click)
 
     def notify_map_updated(self):
         self._queue.put(MAP_UPDATE)
