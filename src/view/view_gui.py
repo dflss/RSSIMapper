@@ -136,13 +136,10 @@ class ViewGUI(View):
     def _process_incoming_queue_messages(self):
         """Handle all messages currently in the queue, if any."""
         while self._queue.qsize():
-            try:
-                msg = self._queue.get()
-                if msg == MAP_UPDATE:
-                    self._clear_measurement_progress_label()
-                    self._presenter.update_map()
-            except self._queue.empty():
-                pass
+            msg = self._queue.get()
+            if msg == MAP_UPDATE:
+                self._clear_measurement_progress_label()
+                self._presenter.update_map(self.chosen_value.get())
 
     def _check_queue(self):
         """Check every 200 ms if there is something new in the queue and process incoming messages."""
