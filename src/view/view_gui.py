@@ -7,7 +7,7 @@ from queue import Queue
 from tkinter import ttk, filedialog
 from tkinter.ttk import Radiobutton
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk  # type: ignore
 import matplotlib.pyplot as plt
 
 from src.constants import RSSI_CHOICE, PERCENT_CHOICE
@@ -29,6 +29,7 @@ class ViewGUI(View):
         self.settings = self._fetch_saved_settings()
         self.fields = asdict(self.settings)
         self.received_status = 0
+        self.toolbar = None
 
     def show(self):
         self._root.title("RSSIMapper")
@@ -129,6 +130,10 @@ class ViewGUI(View):
         self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.canvas.mpl_connect("button_press_event", self._on_map_click)
+        if not self.toolbar:
+            self.toolbar = NavigationToolbar2Tk(self.canvas, self.tab2)
+            self.toolbar.update()
+            self.toolbar.pack()
 
     def notify_map_updated(self):
         self._queue.put(MAP_UPDATE)

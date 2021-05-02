@@ -5,8 +5,9 @@ from src.model.measurements_map import MeasurementsMap
 
 
 class MapPlotter:
-    def __init__(self, map: MeasurementsMap):
+    def __init__(self, map: MeasurementsMap, tick_spacing: int):
         self.map = map
+        self.tick_spacing = tick_spacing
 
     def create_raw_map(self) -> plt.Figure:
         fig = plt.figure()
@@ -32,9 +33,8 @@ class MapPlotter:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_aspect("equal", adjustable="box")  # type: ignore
-        tick_spacing = 2
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]
@@ -65,9 +65,8 @@ class MapPlotter:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_aspect("equal", adjustable="box")  # type: ignore
-        tick_spacing = 2
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))  # type: ignore
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore
         for shaperec in self.map.shape_records:
             x = [i[0] for i in shaperec.shape.points[:]]
             y = [i[1] for i in shaperec.shape.points[:]]

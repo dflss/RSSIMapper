@@ -43,5 +43,6 @@ class ConfigManager:
             "n_measurements_per_point",
             str(program_data.n_measurements_per_point),
         )
+        parser.set("Settings", "tick_spacing", str(program_data.tick_spacing))
         with open(self.config_file_path, "w") as fp:
             parser.write(fp)

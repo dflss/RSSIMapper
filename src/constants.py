@@ -15,4 +15,5 @@ DEFAULT_PROGRAM_DATA = ProgramData(
     10,
     100,
     100,
+    10
 )

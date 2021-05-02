@@ -44,6 +44,7 @@ class Model:
             or self.program_data.input_shapefile != program_data.input_shapefile
             or self.program_data.output_shapefile != program_data.output_shapefile
             or self.program_data.input_csv != program_data.input_csv
+            or self.program_data.tick_spacing != program_data.tick_spacing
         ):
             self.shapefile_mgr = ShapefileManager(
                 program_data.input_shapefile,
@@ -51,7 +52,7 @@ class Model:
                 program_data.input_csv,
             )
             self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
-            self.map_plotter = MapPlotter(self.measurements_map)
+            self.map_plotter = MapPlotter(self.measurements_map, int(program_data.tick_spacing))
         self.program_data = program_data
 
     def get_program_data(self):
@@ -81,4 +82,4 @@ class Model:
 
     def clear_measurements(self):
         self.measurements_map = MeasurementsMap(self.shapefile_mgr.read_shapefile())
-        self.map_plotter = MapPlotter(self.measurements_map)
+        self.map_plotter = MapPlotter(self.measurements_map, int(self.program_data.tick_spacing))
