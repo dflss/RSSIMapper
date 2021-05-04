@@ -100,6 +100,12 @@ class ViewCLI(View):
             help="number of measurements taken for 1 point",
             required=True,
         )
+        required.add_argument(
+            "-t",
+            "--tick_spacing",
+            help="spacing between axis ticks",
+            required=True,
+        )
         parser._action_groups.append(optional)
         args = parser.parse_args()
         return ProgramData(
@@ -114,6 +120,7 @@ class ViewCLI(View):
             int(args.serial_timeout),
             int(args.measurement_timeout),
             int(args.n_measurements),
+            int(args.tick_spacing)
         )
 
     def measure_point(self):
