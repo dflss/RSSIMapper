@@ -11,7 +11,7 @@ import tkinter.constants as Tkconstants
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # type: ignore
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure  # type: ignore
 
 from src.constants import RSSI_CHOICE, PERCENT_CHOICE
 from src.log import logger
