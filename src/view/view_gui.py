@@ -2,7 +2,6 @@ import os
 import threading
 import tkinter as tk
 import functools
-fp = functools.partial
 from dataclasses import asdict
 
 from queue import Queue
@@ -202,8 +201,8 @@ class ViewGUI(View):
         self.canvas.yview_scroll(int(scroll), "units")
 
     def _bind_to_mousewheel(self, event):
-        self.canvas.bind_all("<Button-4>", fp(self._on_mousewheel, scroll=-1))
-        self.canvas.bind_all("<Button-5>", fp(self._on_mousewheel, scroll=1))
+        self.canvas.bind_all("<Button-4>", functools.partial(self._on_mousewheel, scroll=-1))
+        self.canvas.bind_all("<Button-5>", functools.partial(self._on_mousewheel, scroll=1))
 
     def _unbind_from_mousewheel(self, event):
         self.canvas.unbind_all("<Button-4>")
