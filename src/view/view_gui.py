@@ -1,6 +1,8 @@
 import os
 import threading
 import tkinter as tk
+import functools
+fp = functools.partial
 from dataclasses import asdict
 
 from queue import Queue
@@ -31,6 +33,13 @@ class ViewGUI(View):
         self.settings = self._fetch_saved_settings()
         self.fields = asdict(self.settings)
         self.received_status = 0
+        self.frame = None
+        self.canvas = None
+        self.buttonFrame = None
+        self.x_scrollbar = None
+        self.y_scrollbar = None
+        self.fig_agg = None
+        self.mpl_canvas = None
 
     def show(self):
         self._root.title("RSSIMapper")
@@ -122,79 +131,100 @@ class ViewGUI(View):
         entry.delete(0, tk.END)
         entry.insert(0, filename)
 
-    def printBboxes(self, label=""):
-        print("  " + label,
-              "canvas.bbox:", self.canvas.bbox(Tkconstants.ALL),
-              "mplCanvas.bbox:", self.mplCanvas.bbox(Tkconstants.ALL))
+    def _clear_figure_canvas(self):
+        try:
+            self.frame.destroy()
+            self.frame = None
+            self.canvas.destroy()
+            self.canvas = None
+            self.buttonFrame.destroy()
+            self.buttonFrame = None
+            self.x_scrollbar.destroy()
+            self.x_scrollbar = None
+            self.y_scrollbar.destroy()
+            self.y_scrollbar = None
+            self.mpl_canvas.destroy()
+            self.mpl_canvas = None
+            self.fig_agg.get_tk_widget().pack_forget()
+        except AttributeError:
+            pass
 
-    def addScrollingFigure(self, figure, frame):
-        # set up a canvas with scrollbars
-        self.canvas = tk.Canvas(frame)
+    def _create_figure_frame(self):
+        self.frame = tk.Frame(self.tab2)
+        self.frame.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.columnconfigure(1, weight=1)
+        self.canvas = tk.Canvas(self.frame)
         self.canvas.grid(row=1, column=1, sticky=Tkconstants.NSEW)
 
-        xScrollbar = tk.Scrollbar(frame, orient=Tkconstants.HORIZONTAL)
-        yScrollbar = tk.Scrollbar(frame)
+    def _setup_figure_scrollbars(self):
+        self.x_scrollbar = tk.Scrollbar(self.frame, orient=Tkconstants.HORIZONTAL)
+        self.y_scrollbar = tk.Scrollbar(self.frame)
 
-        xScrollbar.grid(row=2, column=1, sticky=Tkconstants.EW)
-        yScrollbar.grid(row=1, column=2, sticky=Tkconstants.NS)
+        self.x_scrollbar.grid(row=2, column=1, sticky=Tkconstants.EW)
+        self.y_scrollbar.grid(row=1, column=2, sticky=Tkconstants.NS)
 
-        self.canvas.config(xscrollcommand=xScrollbar.set)
-        xScrollbar.config(command=self.canvas.xview)
-        self.canvas.config(yscrollcommand=yScrollbar.set)
-        yScrollbar.config(command=self.canvas.yview)
+        self.canvas.config(xscrollcommand=self.x_scrollbar.set)
+        self.x_scrollbar.config(command=self.canvas.xview)
+        self.canvas.config(yscrollcommand=self.y_scrollbar.set)
+        self.y_scrollbar.config(command=self.canvas.yview)
 
-        # plug in the figure
-        self.figAgg = FigureCanvasTkAgg(figure, self.canvas)
-        self.mplCanvas = self.figAgg.get_tk_widget()
-        self.figAgg.mpl_connect("button_press_event", self._on_map_click)
+    def _plug_figure_to_canvas(self, figure):
+        self.fig_agg = FigureCanvasTkAgg(figure, self.canvas)
+        self.mpl_canvas = self.fig_agg.get_tk_widget()
+        self.fig_agg.mpl_connect("button_press_event", self._on_map_click)
 
-        # and connect figure with scrolling region
-        self.cwid = self.canvas.create_window(0, 0, window=self.mplCanvas, anchor=Tkconstants.NW)
-        self.printBboxes("Init")
+    def _connect_figure_to_scrollable_region(self):
+        self.cwid = self.canvas.create_window(0, 0, window=self.mpl_canvas, anchor=Tkconstants.NW)
         self.canvas.config(scrollregion=self.canvas.bbox(Tkconstants.ALL), width=200, height=200)
-        buttonFrame = tk.Frame(self.tab2)
-        buttonFrame.pack()
-        biggerButton = tk.Button(buttonFrame, text="larger",
-                                 command=lambda: self.changeSize(figure, 1.5))
+
+    def _change_map_size(self, figure: Figure, factor):
+        old_size = figure.get_size_inches()
+        figure.set_size_inches([factor * s for s in old_size])
+        wi, hi = [i * figure.dpi for i in figure.get_size_inches()]
+        if self.mpl_canvas and self.canvas:
+            self.mpl_canvas.config(width=wi, height=hi)
+            self.canvas.itemconfigure(self.cwid, width=wi, height=hi)
+            self.canvas.config(scrollregion=self.canvas.bbox(Tkconstants.ALL), width=200, height=200)
+            figure.canvas.draw()
+
+    def _setup_zoom_buttons(self, figure):
+        self.buttonFrame = tk.Frame(self.tab2)
+        self.buttonFrame.pack()
+        biggerButton = tk.Button(self.buttonFrame, text="larger",
+                                 command=lambda: self._change_map_size(figure, 1.5))
         biggerButton.grid(column=1, row=1)
-        smallerButton = tk.Button(buttonFrame, text="smaller",
-                                  command=lambda: self.changeSize(figure, .5))
+        smallerButton = tk.Button(self.buttonFrame, text="smaller",
+                                  command=lambda: self._change_map_size(figure, .5))
         smallerButton.grid(column=1, row=2)
 
-    def changeSize(self, figure: Figure, factor):
-        oldSize = figure.get_size_inches()
-        print("old size is", oldSize)
-        figure.set_size_inches([factor * s for s in oldSize])
-        wi, hi = [i * figure.dpi for i in figure.get_size_inches()]
-        print("new size is", figure.get_size_inches())
-        print("new size pixels: ", wi, hi)
-        self.mplCanvas.config(width=wi, height=hi)
-        self.printBboxes("A")
-        self.canvas.itemconfigure(self.cwid, width=wi, height=hi)
-        self.printBboxes("B")
-        self.canvas.config(scrollregion=self.canvas.bbox(Tkconstants.ALL), width=200, height=200)
-        figure.canvas.draw();
-        self.printBboxes("C")
-        print()
+    def _on_mousewheel(self, event, scroll):
+        self.canvas.yview_scroll(int(scroll), "units")
+
+    def _bind_to_mousewheel(self, event):
+        self.canvas.bind_all("<Button-4>", fp(self._on_mousewheel, scroll=-1))
+        self.canvas.bind_all("<Button-5>", fp(self._on_mousewheel, scroll=1))
+
+    def _unbind_from_mousewheel(self, event):
+        self.canvas.unbind_all("<Button-4>")
+        self.canvas.unbind_all("<Button-5>")
+
+    def _setup_mousewheel_bindings(self):
+        self.canvas.bind('<Enter>', self._bind_to_mousewheel)
+        self.canvas.bind('<Leave>', self._unbind_from_mousewheel)
+
+    def _add_scrollable_figure(self, figure):
+        self._clear_figure_canvas()
+        self._create_figure_frame()
+        self._setup_figure_scrollbars()
+        self._plug_figure_to_canvas(figure)
+        self._connect_figure_to_scrollable_region()
+        self._setup_zoom_buttons(figure)
+        self._setup_mousewheel_bindings()
 
     def render_map(self, figure: plt.Figure):
-        try:
-            self.figAgg.get_tk_widget().pack_forget()
-            print("remove")
-            self.figAgg = FigureCanvasTkAgg(figure, self.canvas)
-            self.mplCanvas = self.figAgg.get_tk_widget()
-            self.figAgg.mpl_connect("button_press_event", self._on_map_click)
-        except AttributeError:
-            frame = tk.Frame(self.tab2)
-            frame.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-            frame.rowconfigure(1, weight=1)
-            frame.columnconfigure(1, weight=1)
-            self.addScrollingFigure(figure, frame)
         self._clear_measurement_progress_label()
-
-        # self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(figure, master=self.tab2)
-        # self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        # self.canvas.mpl_connect("button_press_event", self._on_map_click)
+        self._add_scrollable_figure(figure)
 
     def notify_map_updated(self):
         self._queue.put(MAP_UPDATE)
