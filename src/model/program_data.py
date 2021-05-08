@@ -14,3 +14,4 @@ class ProgramData:
     serial_timeout: int
     measurement_timeout: int
     n_measurements_per_point: int
+    tick_spacing: int

@@ -10,3 +10,4 @@ baudrate = 115200
 serial_timeout = 10
 measurement_timeout = 60
 n_measurements_per_point = 100
+tick_spacing = 10
