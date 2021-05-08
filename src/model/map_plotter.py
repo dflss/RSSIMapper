@@ -30,7 +30,7 @@ class MapPlotter:
             else:
                 return "red"
 
-        fig = plt.figure()
+        fig = plt.figure(dpi=150, figsize=(20, 20))
         ax = fig.add_subplot(111)
         ax.set_aspect("equal", adjustable="box")  # type: ignore
         ax.xaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore
@@ -62,7 +62,7 @@ class MapPlotter:
             else:
                 return "red"
 
-        fig = plt.figure()
+        fig = plt.figure(dpi=150, figsize=(20, 20))
         ax = fig.add_subplot(111)
         ax.set_aspect("equal", adjustable="box")  # type: ignore
         ax.xaxis.set_major_locator(ticker.MultipleLocator(self.tick_spacing))  # type: ignore

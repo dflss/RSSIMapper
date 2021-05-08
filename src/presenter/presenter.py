@@ -60,7 +60,7 @@ class Presenter:
             fig = self.model.get_map_with_percent_values()
             self.model.save_plot(self.model.program_data.output_plot_perc)
         else:
-            raise ValueError("Incorrect choice value")
+            raise ValueError(f"Incorrect choice value: {choice}")
         self.view.render_map(fig)
 
     def clear_map(self):
